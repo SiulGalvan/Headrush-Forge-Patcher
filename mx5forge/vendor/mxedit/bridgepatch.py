@@ -79,6 +79,7 @@ MIDI_BLOCK = '''    ### MX5 Bridge: USB-MIDI-Funktion (nicht kritisch) ###
       logger -t mx5bridge "USB-MIDI-Funktion konnte nicht angelegt werden"; true; } &&
 '''
 ENABLE = '    ### Enable the gadget:\n    echo ff580000.usb >UDC\n)\n'
+AUDIO_MIDI = True      # mx5forge: False = no MIDI function inside the USB-audio gadget (the stand-alone MIDI gadget stays)
 HOOK = '/usr/Evil/Scripts/mx5bridge-usb.sh'
 DBHOOK = '/usr/Evil/Scripts/mx5bridge-db.sh'
 SQLITE_TARGET = '/usr/Evil/Scripts/mx5bridge-sqlite3'
@@ -111,7 +112,7 @@ def patch_start(text):
     mp = 'modprobe configfs &&\n'
     need(text.count(mp) == 1, 'USB start script has an unexpected layout')
     text = text.replace(mp, '%s evil-begin audio\n' % HOOK + mp)
-    return text.replace(ENABLE, MIDI_BLOCK + ENABLE)
+    return text.replace(ENABLE, (MIDI_BLOCK if AUDIO_MIDI else '') + ENABLE)   # mx5forge: AUDIO_MIDI switch
 
 
 def patch_stop(text):

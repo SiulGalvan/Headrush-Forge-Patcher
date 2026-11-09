@@ -19,3 +19,4 @@ from the official updater on the user's own computer and patches them there.
 | `mx5forge/nam/blobs/extended/libnam_hook.so`, `libnam_preload.so` | Gigboard_NAM (NAM Extended) build output | GPL-3 | sources in `nam_source_extended/` (nam_hook.cpp, nam_preload.cpp, build scripts); NeuralAmpModelerCore (MIT) is fetched by `fetch_nam_core.sh` |
 | `mx5forge/vendor/mxedit/bridgepatch.py` | MX-Edit 0.9.5 | MIT | **one modified line**: the launcher regex also accepts `NAM_HOOK_SLOT_AMP_ADDR` / `NAM_ORIG_AMP_PROCESS_ADDR` |
 | `mx5forge/nam/blobs/extended-fair/libnam_hook.so` | derived from the Extended hook by `tools/make_extended_fair.py` (6 call sites neutralised) | GPL-3 | same sources as `nam_source_extended/`, minus the `lower_background_thread_priority()` effect |
+| `mx5forge/vendor/mxedit/bridgepatch.py` (2nd change) | MX-Edit 0.9.5 | MIT | module switch `AUDIO_MIDI` (default True = unchanged behaviour) to omit the MIDI function inside the USB-audio gadget |

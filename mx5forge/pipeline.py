@@ -24,21 +24,26 @@ ERRORS = (patcher.Fail, bridgepatch.PatchError, ext4.Ext4Error, qmlport.ArtError
 
 class Options:
     def __init__(self, instances=2, bridge=True, design=False, rack_dir=None, source=None, out_parent=None,
-                 log=print, progress=None, engine="nam-mod", amp=False):
+                 log=print, progress=None, engine="nam-mod", amp=False, audio_midi=True):
         self.instances, self.bridge, self.design = instances, bridge, design
         self.rack_dir, self.source, self.out_parent = rack_dir, source, out_parent
         self.log, self.progress = log, progress
         self.engine, self.amp = engine, amp
+        self.audio_midi = audio_midi
 
 
 def label(o):
+    if not o.instances:
+        return "MX5 Bridge only (no NAM)"
     return "NAM x%d%s%s%s%s" % (o.instances, {"extended": " Extended", "extended-fair": " Extended (fair)"}.get(o.engine, ""), " + NAM amp" if o.amp else "",
                                 " + MX5 Bridge" if o.bridge else "", " + pedal design" if o.design else "")
 
 
 def folder_name(o):
+    if not o.instances:
+        return "HeadRush_MX5_2.7_BridgeOnly%s_Updater" % ("" if o.audio_midi else "Lite")
     return "HeadRush_MX5_2.7_NAM%d%s%s%s%s_Updater" % (o.instances, {"extended": "_Ext", "extended-fair": "_ExtFair"}.get(o.engine, ""), "_Amp" if o.amp else "",
-                                                   "_Bridge" if o.bridge else "", "_Design" if o.design else "")
+                                                   ("_Bridge" if o.audio_midi else "_BridgeLite") if o.bridge else "", "_Design" if o.design else "")
 
 
 def config_json(o, original):
@@ -55,8 +60,10 @@ def config_json(o, original):
 
 
 def check_options(o):
-    if o.instances not in (2, 4):
-        raise Fail("instances must be 2 or 4")
+    if o.instances not in (0, 2, 4):
+        raise Fail("instances must be 0 (no NAM, diagnostic), 2 or 4")
+    if o.instances == 0 and (o.design or o.amp or not o.bridge):
+        raise Fail("0 NAM instances is a diagnostic build: only the MX5 Bridge can be applied")
     if o.engine not in nam_install.ENGINES:
         raise Fail("engine must be one of: " + ", ".join(nam_install.ENGINES))
     if o.amp and o.engine == "nam-mod":
@@ -100,12 +107,14 @@ def build(o):
         fs = ext4.Ext4(lzma.decompress(fitpatch.extract(raw, "rootfs")))
         fs.check()
 
-        evil = bytearray(fs.cat(nam_install.EVIL))
-        slot, slot2, slot_amp = nam_install.hijack_evil(evil, o.instances, log, amp=o.amp)
-        if o.design:
-            art_apply.apply(evil, o.rack_dir, nam_v2_badge=(o.instances == 4), log=log)
-        nam_install.install(fs, evil, slot, slot2, log, engine=o.engine, slot_amp_hex=slot_amp)
-        written = {nam_install.EVIL: bytes(evil)}
+        written = {}
+        if o.instances:
+            evil = bytearray(fs.cat(nam_install.EVIL))
+            slot, slot2, slot_amp = nam_install.hijack_evil(evil, o.instances, log, amp=o.amp)
+            if o.design:
+                art_apply.apply(evil, o.rack_dir, nam_v2_badge=(o.instances == 4), log=log)
+            nam_install.install(fs, evil, slot, slot2, log, engine=o.engine, slot_amp_hex=slot_amp)
+            written[nam_install.EVIL] = bytes(evil)
 
         if o.bridge:
             def cat(p):
@@ -113,7 +122,8 @@ def build(o):
                     return fs.cat(p)
                 except FileNotFoundError:
                     return b""
-            info = "nam_mod_ref=%s via mx5forge %s\nnam_instanzen=%d\n" % ("Gigboard_NAM extended" if o.engine != "nam-mod" else "headrush-nam-mod 0.1.6", __version__, o.instances)
+            info = None if not o.instances else "nam_mod_ref=%s via mx5forge %s\nnam_instanzen=%d\n" % ("Gigboard_NAM extended" if o.engine != "nam-mod" else "headrush-nam-mod 0.1.6", __version__, o.instances)
+            bridgepatch.AUDIO_MIDI = o.audio_midi
             files, _ = bridgepatch.plan(cat, info, log=log, device=found["device"])
             log("MX5 Bridge: writing %d files ..." % len(files))
             for target, (data, mode) in files.items():
