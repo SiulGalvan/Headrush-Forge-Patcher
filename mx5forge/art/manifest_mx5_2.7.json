@@ -1,0 +1,743 @@
+{
+ "firmware": "HeadRush MX5 2.7 (inmusic,hg04)",
+ "qml": {
+  "name": "ActiveStomp.qml",
+  "blob_off": 25617395,
+  "blob_len_prefix": 2791,
+  "stock_clen": 2787,
+  "stock_ulen": 17271,
+  "stock_sha1": "be4292c31b06fab03784c8fb70e7e8386023975e",
+  "register_off": 47593152,
+  "register_byte_off": 64
+ },
+ "images": {
+  "8-Bit Crush.png": {
+   "pos": 31551400,
+   "slot": 93959,
+   "w": 286,
+   "h": 442,
+   "mode": "RGBA",
+   "sha1": "5caf40dd043f3a1dc7b06d66c009ea1cbf27b8e4"
+  },
+  "AIR Delay.png": {
+   "pos": 30084363,
+   "slot": 26422,
+   "w": 512,
+   "h": 57,
+   "mode": "RGB",
+   "sha1": "5e5ae3b09af9dc3027a4b5726b4da3636fadbd8e"
+  },
+  "AIR Filter.png": {
+   "pos": 32520869,
+   "slot": 93515,
+   "w": 286,
+   "h": 442,
+   "mode": "RGBA",
+   "sha1": "1bb96bf5c1041cdda550a1c6aebb87582f4d5650"
+  },
+  "AIR Flanger.png": {
+   "pos": 35317706,
+   "slot": 117374,
+   "w": 286,
+   "h": 437,
+   "mode": "RGBA",
+   "sha1": "4d752f5fd3dd3df5ebd82e64bb16b04d79780ba1"
+  },
+  "AIR Reverb.png": {
+   "pos": 30338282,
+   "slot": 101926,
+   "w": 286,
+   "h": 437,
+   "mode": "RGBA",
+   "sha1": "b2c7ec36444fe8d2f355e73ef7af03afdf579fc1"
+  },
+  "AIR Vibrato.png": {
+   "pos": 35228090,
+   "slot": 89612,
+   "w": 286,
+   "h": 437,
+   "mode": "RGBA",
+   "sha1": "858bfbe0821a224f082e1efa5b6f50e5b59e8376"
+  },
+  "Acoust Sim.png": {
+   "pos": 32783567,
+   "slot": 62575,
+   "w": 286,
+   "h": 442,
+   "mode": "RGBA",
+   "sha1": "c8e581cb93732c9231ac0141a068e25ece4b6c94"
+  },
+  "Acoustic Pre.png": {
+   "pos": 30258015,
+   "slot": 80263,
+   "w": 286,
+   "h": 437,
+   "mode": "RGBA",
+   "sha1": "2156c376367e0c9546bd492d9ff0890e3fd9a7af"
+  },
+  "Ambi Verb.png": {
+   "pos": 31347597,
+   "slot": 60668,
+   "w": 307,
+   "h": 307,
+   "mode": "RGBA",
+   "sha1": "eb11a1eacfd717adb4c1958af1a4d5bcd08be67d"
+  },
+  "Amp.png": {
+   "pos": 36297698,
+   "slot": 58873,
+   "w": 288,
+   "h": 457,
+   "mode": "RGBA",
+   "sha1": "8b5a00198026bba245c5821569062ab42c94db39"
+  },
+  "Anxiety OD V2.png": {
+   "pos": 32136436,
+   "slot": 75519,
+   "w": 286,
+   "h": 442,
+   "mode": "RGBA",
+   "sha1": "6c689a9fa6fb5f1af9177ad020fae072d5e9c741"
+  },
+  "Anxiety OD.png": {
+   "pos": 33258125,
+   "slot": 75519,
+   "w": 286,
+   "h": 442,
+   "mode": "RGBA",
+   "sha1": "6c689a9fa6fb5f1af9177ad020fae072d5e9c741"
+  },
+  "Auto Swell.png": {
+   "pos": 34678089,
+   "slot": 87432,
+   "w": 286,
+   "h": 437,
+   "mode": "RGBA",
+   "sha1": "5bfc7c125474c4ad9c486d48df7f5c0498369667"
+  },
+  "B Dist 7000.png": {
+   "pos": 31184137,
+   "slot": 81720,
+   "w": 286,
+   "h": 230,
+   "mode": "RGBA",
+   "sha1": "e3e7f3b8ff2a2f4c006a795423e88781e88d3448"
+  },
+  "B2 Drive.png": {
+   "pos": 36356575,
+   "slot": 80194,
+   "w": 286,
+   "h": 437,
+   "mode": "RGBA",
+   "sha1": "492cd4469104dec52064b114f4852273f69a07e2"
+  },
+  "BBD Delay.png": {
+   "pos": 31704388,
+   "slot": 122012,
+   "w": 286,
+   "h": 436,
+   "mode": "RGBA",
+   "sha1": "150a8cd637b47256fb838455e5e6cff9b3ac3a31"
+  },
+  "Bass EQ.png": {
+   "pos": 30110789,
+   "slot": 120221,
+   "w": 286,
+   "h": 436,
+   "mode": "RGBA",
+   "sha1": "8da49dd47cd726fb0076c13f740eefd4946dd989"
+  },
+  "Black OP.png": {
+   "pos": 35010253,
+   "slot": 84208,
+   "w": 310,
+   "h": 437,
+   "mode": "RGBA",
+   "sha1": "b289bdecd1479903731603dbaf404b83f1929766"
+  },
+  "Black Wah.png": {
+   "pos": 30440212,
+   "slot": 34275,
+   "w": 228,
+   "h": 401,
+   "mode": "RGBA",
+   "sha1": "de9f445a670055b7313f0d2c92072a5100243764"
+  },
+  "Cab.png": {
+   "pos": 35968248,
+   "slot": 40592,
+   "w": 288,
+   "h": 487,
+   "mode": "RGBA",
+   "sha1": "072050072ac61b4525b5fb221dcf323979145e87"
+  },
+  "Capo.png": {
+   "pos": 33841720,
+   "slot": 83722,
+   "w": 286,
+   "h": 455,
+   "mode": "RGBA",
+   "sha1": "fbd6a5582df7f48a369f83d54dd60535cbcf1b15"
+  },
+  "Chord Wham.png": {
+   "pos": 34016656,
+   "slot": 79202,
+   "w": 416,
+   "h": 493,
+   "mode": "RGBA",
+   "sha1": "4da8ba8bebf8707ebb27b57132a7331427b47c49"
+  },
+  "Chorus.png": {
+   "pos": 33400834,
+   "slot": 96179,
+   "w": 286,
+   "h": 436,
+   "mode": "RGBA",
+   "sha1": "1cd2be56044dd1509ae0ad0e262c49b750c316d0"
+  },
+  "D1 Dist.png": {
+   "pos": 30506460,
+   "slot": 61040,
+   "w": 286,
+   "h": 442,
+   "mode": "RGBA",
+   "sha1": "d9dadcd453ccaabee6530fe81e0b226a8cfc5e3d"
+  },
+  "D250 Drive.png": {
+   "pos": 35435084,
+   "slot": 85705,
+   "w": 286,
+   "h": 442,
+   "mode": "RGBA",
+   "sha1": "f2d74fedbef5f4eaf3d35175691f29f8daec4d34"
+  },
+  "DC Distort.png": {
+   "pos": 31054378,
+   "slot": 77920,
+   "w": 286,
+   "h": 442,
+   "mode": "RGBA",
+   "sha1": "0abab54b9376f48e9ae5a9b2f08323cb4e3aa19f"
+  },
+  "Detune.png": {
+   "pos": 30567504,
+   "slot": 22827,
+   "w": 512,
+   "h": 57,
+   "mode": "RGB",
+   "sha1": "f443af98bb5d0e23ecab5134fda29983361050c0"
+  },
+  "Dim Chorus.png": {
+   "pos": 34853145,
+   "slot": 85961,
+   "w": 286,
+   "h": 437,
+   "mode": "RGBA",
+   "sha1": "0b79e6e16e7eef3be915a45048e2b67ed457967a"
+  },
+  "Drop Tune.png": {
+   "pos": 36529650,
+   "slot": 76498,
+   "w": 286,
+   "h": 436,
+   "mode": "RGBA",
+   "sha1": "2eebce105630473644041c276f00c17f738d9a3d"
+  },
+  "Dyn Delay.png": {
+   "pos": 31826404,
+   "slot": 41443,
+   "w": 547,
+   "h": 195,
+   "mode": "RGBA",
+   "sha1": "4e5cef2f452de9eace46eb80bfd172ea64ef7543"
+  },
+  "DynIII Comp.png": {
+   "pos": 32211959,
+   "slot": 32113,
+   "w": 512,
+   "h": 57,
+   "mode": "RGB",
+   "sha1": "852722b7c4121ae598f4f972112127e0b3bc0e92"
+  },
+  "Eleven Reverb.png": {
+   "pos": 35094465,
+   "slot": 41681,
+   "w": 512,
+   "h": 56,
+   "mode": "RGB",
+   "sha1": "885f7f5c4c1be7baf7b74b9041249ec6afd87b57"
+  },
+  "Env Filter.png": {
+   "pos": 34202139,
+   "slot": 50276,
+   "w": 286,
+   "h": 437,
+   "mode": "RGBA",
+   "sha1": "97f2d1bbd5543c994fb36b6b995f6f4a6af2f494"
+  },
+  "FX-Loop.png": {
+   "pos": 34765525,
+   "slot": 87616,
+   "w": 286,
+   "h": 455,
+   "mode": "RGBA",
+   "sha1": "d8089952bf00a0d55d6874a754547aabea5cd60c"
+  },
+  "Feedback.png": {
+   "pos": 33203845,
+   "slot": 54276,
+   "w": 416,
+   "h": 493,
+   "mode": "RGBA",
+   "sha1": "46a5c7506533e81a0603f9b1997ae35e0b46aa22"
+  },
+  "Flanger.png": {
+   "pos": 35789079,
+   "slot": 117723,
+   "w": 286,
+   "h": 437,
+   "mode": "RGBA",
+   "sha1": "6dd622d7fc7db2c32bb38c83c8abf297c2a7e588"
+  },
+  "Gate.png": {
+   "pos": 30683693,
+   "slot": 89484,
+   "w": 303,
+   "h": 449,
+   "mode": "RGBA",
+   "sha1": "64126c742bc437694fec93f1580348a311a44947"
+  },
+  "Glorious Drive.png": {
+   "pos": 32244076,
+   "slot": 195283,
+   "w": 286,
+   "h": 437,
+   "mode": "RGBA",
+   "sha1": "1a7b947b889d9beca1989e482680c8f5aef3b2ae"
+  },
+  "Graphic EQ.png": {
+   "pos": 31265861,
+   "slot": 81732,
+   "w": 286,
+   "h": 455,
+   "mode": "RGBA",
+   "sha1": "cc361040545e9664ab1a4bc1cd1dd18ca5fbefc5"
+  },
+  "Gray Comp.png": {
+   "pos": 32846146,
+   "slot": 93503,
+   "w": 286,
+   "h": 455,
+   "mode": "RGBA",
+   "sha1": "89990509e48796157661582341972df02fe7bc6a"
+  },
+  "Green JRC-OD.png": {
+   "pos": 33497017,
+   "slot": 120961,
+   "w": 303,
+   "h": 449,
+   "mode": "RGBA",
+   "sha1": "dd9df53b6a687db8e50ec05056a3a132395cbf38"
+  },
+  "Guitar Synth.png": {
+   "pos": 35136150,
+   "slot": 91936,
+   "w": 286,
+   "h": 437,
+   "mode": "RGBA",
+   "sha1": "1427fb9032cec235e97882c2efec93fb41774c1b"
+  },
+  "Harm.png": {
+   "pos": 36008844,
+   "slot": 78129,
+   "w": 228,
+   "h": 401,
+   "mode": "RGBA",
+   "sha1": "8a2934db8aaab8ffbd18cca3fbf1ab9c70969339"
+  },
+  "Hold.png": {
+   "pos": 36148419,
+   "slot": 149275,
+   "w": 286,
+   "h": 437,
+   "mode": "RGBA",
+   "sha1": "6b1a1cd8230f9c9d089044156228d3f21bf86f7b"
+  },
+  "IR (1024).png": {
+   "pos": 33333648,
+   "slot": 31602,
+   "w": 206,
+   "h": 212,
+   "mode": "RGBA",
+   "sha1": "40f5ec740435f831c12fcdc02a5b028231a1b53e"
+  },
+  "IR (1024)2.png": {
+   "pos": 36702206,
+   "slot": 31965,
+   "w": 206,
+   "h": 212,
+   "mode": "RGBA",
+   "sha1": "1318e2acdccaed9f8bfcd89f2570aaa04081794c"
+  },
+  "IR.png": {
+   "pos": 31408269,
+   "slot": 31602,
+   "w": 206,
+   "h": 212,
+   "mode": "RGBA",
+   "sha1": "40f5ec740435f831c12fcdc02a5b028231a1b53e"
+  },
+  "IR2.png": {
+   "pos": 30474491,
+   "slot": 31965,
+   "w": 206,
+   "h": 212,
+   "mode": "RGBA",
+   "sha1": "1318e2acdccaed9f8bfcd89f2570aaa04081794c"
+  },
+  "K Drive.png": {
+   "pos": 32614388,
+   "slot": 42306,
+   "w": 290,
+   "h": 247,
+   "mode": "RGBA",
+   "sha1": "706946bc0cda4e3ef73ac5d1b63a95fb97467c44"
+  },
+  "MX Dist.png": {
+   "pos": 33617982,
+   "slot": 81280,
+   "w": 286,
+   "h": 442,
+   "mode": "RGBA",
+   "sha1": "e7cfa720eb6c920b76d1d4341dd388b6a034e1aa"
+  },
+  "Mix.png": {
+   "pos": 36525584,
+   "slot": 4062,
+   "w": 139,
+   "h": 171,
+   "mode": "RGB",
+   "sha1": "88b91aaf23309015f8bed14f317746f5efc73354"
+  },
+  "More Wah.png": {
+   "pos": 30916756,
+   "slot": 74740,
+   "w": 286,
+   "h": 436,
+   "mode": "RGBA",
+   "sha1": "6af33ad0f1f2efd59fb7258240eaa9b5ca3d37e1"
+  },
+  "Multi Chorus.png": {
+   "pos": 33986851,
+   "slot": 29801,
+   "w": 512,
+   "h": 57,
+   "mode": "RGB",
+   "sha1": "9269180a2de70fe3356d311097c37d08f13d4f25"
+  },
+  "Noise Filter.png": {
+   "pos": 30810277,
+   "slot": 24762,
+   "w": 512,
+   "h": 57,
+   "mode": "RGB",
+   "sha1": "3ace3ad5f998831ba92435705bc0b2a65485dad5"
+  },
+  "Oct Fuzz.png": {
+   "pos": 35644237,
+   "slot": 75435,
+   "w": 286,
+   "h": 442,
+   "mode": "RGBA",
+   "sha1": "36b9f67353bac53d13ddbb203463d3f8fd66eba1"
+  },
+  "Octaves Up.png": {
+   "pos": 31645363,
+   "slot": 59021,
+   "w": 286,
+   "h": 442,
+   "mode": "RGBA",
+   "sha1": "0f1d6a33ee6f13a34f8853846846bc1d44608645"
+  },
+  "Octaves.png": {
+   "pos": 34095862,
+   "slot": 72766,
+   "w": 286,
+   "h": 442,
+   "mode": "RGBA",
+   "sha1": "93a55ce959882e5059f512ec4a0f9ed4dfdea5e5"
+  },
+  "Orange Phaser.png": {
+   "pos": 33699266,
+   "slot": 78069,
+   "w": 286,
+   "h": 455,
+   "mode": "RGBA",
+   "sha1": "787e4d9e0d4c99df82349253e7e271ccf098bfa6"
+  },
+  "Other.png": {
+   "pos": 35719676,
+   "slot": 69399,
+   "w": 288,
+   "h": 457,
+   "mode": "RGBA",
+   "sha1": "c82beba2b2b6adc3f6c3895ab4489bc66206d040"
+  },
+  "Panner.png": {
+   "pos": 36086977,
+   "slot": 61438,
+   "w": 228,
+   "h": 401,
+   "mode": "LA",
+   "sha1": "b61fdefd2a30702f48375d5e968fa5bfb69e98cc"
+  },
+  "Para EQ.png": {
+   "pos": 31867851,
+   "slot": 28807,
+   "w": 512,
+   "h": 57,
+   "mode": "RGB",
+   "sha1": "b9ac6a47d0889279f93606158f088063433c2291"
+  },
+  "Party Verb.png": {
+   "pos": 35520793,
+   "slot": 60405,
+   "w": 286,
+   "h": 437,
+   "mode": "RGBA",
+   "sha1": "a13970d23c96aa9db81e39e3f82dbe63d45eb228"
+  },
+  "Pitch Delay.png": {
+   "pos": 31489568,
+   "slot": 61828,
+   "w": 286,
+   "h": 442,
+   "mode": "RGBA",
+   "sha1": "119b9b51e0a204a7e1e735d40ac9dbf8dcaa68f6"
+  },
+  "Reso Delay.png": {
+   "pos": 33098572,
+   "slot": 105269,
+   "w": 286,
+   "h": 437,
+   "mode": "RGBA",
+   "sha1": "e72a006380cdc8d7e8cc86029d880a4430e388e3"
+  },
+  "Reverse Delay.png": {
+   "pos": 34504811,
+   "slot": 63786,
+   "w": 286,
+   "h": 442,
+   "mode": "RGBA",
+   "sha1": "c917e788ed7d02ba4983bd78f7979c3fe27857bb"
+  },
+  "Ring Mod.png": {
+   "pos": 30590335,
+   "slot": 93354,
+   "w": 286,
+   "h": 442,
+   "mode": "RGBA",
+   "sha1": "72607e94c512f131f1c21b1ff07e833f5bd54a31"
+  },
+  "Rotary.png": {
+   "pos": 34939110,
+   "slot": 71139,
+   "w": 286,
+   "h": 442,
+   "mode": "RGBA",
+   "sha1": "22e7333cf1917d7ecf33a1be2432109a823fdacf"
+  },
+  "Round Fuzz.png": {
+   "pos": 31132302,
+   "slot": 51831,
+   "w": 256,
+   "h": 256,
+   "mode": "RGBA",
+   "sha1": "13eb1f12e91bfa474acdd976686939d1a796a171"
+  },
+  "S1 Drive.png": {
+   "pos": 33777339,
+   "slot": 64377,
+   "w": 286,
+   "h": 442,
+   "mode": "RGBA",
+   "sha1": "642e73c7e379fd21d49d2c68440445935ef816e9"
+  },
+  "Shimmer.png": {
+   "pos": 32939653,
+   "slot": 80407,
+   "w": 286,
+   "h": 442,
+   "mode": "RGBA",
+   "sha1": "28b7992ffb0a10b5da90b305d9f9d797405cc002"
+  },
+  "Shine Wah.png": {
+   "pos": 33925446,
+   "slot": 61401,
+   "w": 228,
+   "h": 401,
+   "mode": "RGBA",
+   "sha1": "3870d2edfcd03c382ebdc1f2ad094ba5663b0fad"
+  },
+  "Side Comp.png": {
+   "pos": 34168632,
+   "slot": 33503,
+   "w": 512,
+   "h": 57,
+   "mode": "RGB",
+   "sha1": "51a1b7f3a408de8d7208c308ab18e12f24983a7f"
+  },
+  "Smart Harm.png": {
+   "pos": 30231014,
+   "slot": 26997,
+   "w": 512,
+   "h": 57,
+   "mode": "RGB",
+   "sha1": "12a29622ebb9893fcfaf51dfe307db9b8bb1b957"
+  },
+  "Spring Reverb.png": {
+   "pos": 34252419,
+   "slot": 122746,
+   "w": 286,
+   "h": 436,
+   "mode": "RGBA",
+   "sha1": "75e60ed42879c48e8ee429ae3ced88c03fac4614"
+  },
+  "Stereo Doubler.png": {
+   "pos": 36436773,
+   "slot": 88807,
+   "w": 286,
+   "h": 455,
+   "mode": "RGBA",
+   "sha1": "19b9f740a93b7e146c46041dcbb1c61b200528eb"
+  },
+  "Stone Phaser.png": {
+   "pos": 34375169,
+   "slot": 129638,
+   "w": 286,
+   "h": 437,
+   "mode": "RGBA",
+   "sha1": "6566cfaf4291c11dfa578a382d1d0957c273cc11"
+  },
+  "Sustain.png": {
+   "pos": 35581202,
+   "slot": 63031,
+   "w": 286,
+   "h": 436,
+   "mode": "RGBA",
+   "sha1": "719fc6de91a7fab13d46cf0381302d6a3133a966"
+  },
+  "Tape Echo.png": {
+   "pos": 33365254,
+   "slot": 35576,
+   "w": 512,
+   "h": 57,
+   "mode": "RGB",
+   "sha1": "924f728f3302cd37d61781f039de2e971a2a0bdb"
+  },
+  "Ten Freq EQ.png": {
+   "pos": 30991500,
+   "slot": 62874,
+   "w": 286,
+   "h": 437,
+   "mode": "RGBA",
+   "sha1": "c1b19736a8b3d3767f67b02cb44736dd6b5030e9"
+  },
+  "Time Warp.png": {
+   "pos": 32439363,
+   "slot": 81502,
+   "w": 416,
+   "h": 493,
+   "mode": "RGBA",
+   "sha1": "481d33ad3e58348221eeb67329da74bd276ddde6"
+  },
+  "Tremolo.png": {
+   "pos": 30835043,
+   "slot": 81709,
+   "w": 286,
+   "h": 442,
+   "mode": "RGBA",
+   "sha1": "a7bf1cdc489171584b45b189b6321094a35455f7"
+  },
+  "Tri Fuzz.png": {
+   "pos": 31896662,
+   "slot": 122379,
+   "w": 286,
+   "h": 436,
+   "mode": "RGBA",
+   "sha1": "ecdb2eb13492a471d5c925778d21605aaa367e7c"
+  },
+  "Tron Filter.png": {
+   "pos": 31439875,
+   "slot": 49689,
+   "w": 286,
+   "h": 442,
+   "mode": "RGBA",
+   "sha1": "eaee30d7e87e2b9f408f761a2fd8aa2221d5bb07"
+  },
+  "Tron Phaser.png": {
+   "pos": 32019045,
+   "slot": 117387,
+   "w": 286,
+   "h": 437,
+   "mode": "RGBA",
+   "sha1": "a75ff4ad69d3dd8b91f90afd7f1c5cc8793b90c2"
+  },
+  "Twelve String.png": {
+   "pos": 32656698,
+   "slot": 126865,
+   "w": 303,
+   "h": 449,
+   "mode": "RGBA",
+   "sha1": "428b372e5faed5c9d870b194a170aa72260df257"
+  },
+  "Vibe Phaser.png": {
+   "pos": 34568601,
+   "slot": 109484,
+   "w": 286,
+   "h": 442,
+   "mode": "RGBA",
+   "sha1": "f10dff80a26a7b7b761ec61fad61e988b2d7de15"
+  },
+  "Vibrato.png": {
+   "pos": 36606152,
+   "slot": 96050,
+   "w": 286,
+   "h": 436,
+   "mode": "RGBA",
+   "sha1": "0293b1a0b8abdf2233999b762605025eb6419c25"
+  },
+  "Volume.png": {
+   "pos": 35906806,
+   "slot": 61438,
+   "w": 228,
+   "h": 401,
+   "mode": "LA",
+   "sha1": "b61fdefd2a30702f48375d5e968fa5bfb69e98cc"
+  },
+  "Wham.png": {
+   "pos": 33020064,
+   "slot": 78504,
+   "w": 228,
+   "h": 401,
+   "mode": "RGBA",
+   "sha1": "1290cacf2f40e3589b9e0565f220fbd324358549"
+  },
+  "White Bass Wah.png": {
+   "pos": 30773181,
+   "slot": 37092,
+   "w": 286,
+   "h": 437,
+   "mode": "RGBA",
+   "sha1": "c9557565f37f20e0540ee6c6388520e07cbe9258"
+  },
+  "White Boost.png": {
+   "pos": 30005628,
+   "slot": 78731,
+   "w": 286,
+   "h": 442,
+   "mode": "RGBA",
+   "sha1": "00e57ab3aa8ce543b69824ed51efac0cc9b3c9f1"
+  }
+ }
+}
