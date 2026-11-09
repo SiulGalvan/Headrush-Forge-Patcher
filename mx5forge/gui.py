@@ -61,6 +61,8 @@ class App(tk.Tk):
                         command=self._sync).pack(anchor="w", padx=8, pady=2)
         ttk.Radiobutton(f, text="NAM Extended (gentler background loading; not yet tested on an MX5)", variable=self.engine,
                         value="extended", command=self._sync).pack(anchor="w", padx=8, pady=2)
+        ttk.Radiobutton(f, text="NAM Extended (fair): Extended without the idle-priority background threads (experimental)", variable=self.engine,
+                        value="extended-fair", command=self._sync).pack(anchor="w", padx=8, pady=2)
         self.cb_amp = ttk.Checkbutton(f, text="EXPERIMENTAL: NAM amp block (82 LEAD 800 Bright) - Extended only, never run on an MX5",
                                       variable=self.amp)
         self.cb_amp.pack(anchor="w", padx=24, pady=2)
@@ -110,9 +112,10 @@ class App(tk.Tk):
                   foreground="#a00").pack(anchor="w", **pad)
 
     def _sync(self):
-        if self.engine.get() != "extended":
+        ext = self.engine.get() != "nam-mod"
+        if not ext:
             self.amp.set(False)
-        self.cb_amp.state(["!disabled"] if self.engine.get() == "extended" else ["disabled"])
+        self.cb_amp.state(["!disabled"] if ext else ["disabled"])
         on = self.design.get()
         for w in (self.e_racks, self.b_racks):
             w.state(["!disabled"] if on else ["disabled"])

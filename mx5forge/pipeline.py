@@ -32,12 +32,12 @@ class Options:
 
 
 def label(o):
-    return "NAM x%d%s%s%s%s" % (o.instances, " Extended" if o.engine == "extended" else "", " + NAM amp" if o.amp else "",
+    return "NAM x%d%s%s%s%s" % (o.instances, {"extended": " Extended", "extended-fair": " Extended (fair)"}.get(o.engine, ""), " + NAM amp" if o.amp else "",
                                 " + MX5 Bridge" if o.bridge else "", " + pedal design" if o.design else "")
 
 
 def folder_name(o):
-    return "HeadRush_MX5_2.7_NAM%d%s%s%s%s_Updater" % (o.instances, "_Ext" if o.engine == "extended" else "", "_Amp" if o.amp else "",
+    return "HeadRush_MX5_2.7_NAM%d%s%s%s%s_Updater" % (o.instances, {"extended": "_Ext", "extended-fair": "_ExtFair"}.get(o.engine, ""), "_Amp" if o.amp else "",
                                                    "_Bridge" if o.bridge else "", "_Design" if o.design else "")
 
 
@@ -59,7 +59,7 @@ def check_options(o):
         raise Fail("instances must be 2 or 4")
     if o.engine not in nam_install.ENGINES:
         raise Fail("engine must be one of: " + ", ".join(nam_install.ENGINES))
-    if o.amp and o.engine != "extended":
+    if o.amp and o.engine == "nam-mod":
         raise Fail("the NAM amp block needs the Extended engine")
 
 
@@ -113,7 +113,7 @@ def build(o):
                     return fs.cat(p)
                 except FileNotFoundError:
                     return b""
-            info = "nam_mod_ref=%s via mx5forge %s\nnam_instanzen=%d\n" % ("Gigboard_NAM extended" if o.engine == "extended" else "headrush-nam-mod 0.1.6", __version__, o.instances)
+            info = "nam_mod_ref=%s via mx5forge %s\nnam_instanzen=%d\n" % ("Gigboard_NAM extended" if o.engine != "nam-mod" else "headrush-nam-mod 0.1.6", __version__, o.instances)
             files, _ = bridgepatch.plan(cat, info, log=log, device=found["device"])
             log("MX5 Bridge: writing %d files ..." % len(files))
             for target, (data, mode) in files.items():

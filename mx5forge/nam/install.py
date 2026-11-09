@@ -6,7 +6,7 @@ from .. import fsutil
 from . import elfpatch, launcher, targets
 
 BLOBS = os.path.join(os.path.dirname(os.path.abspath(__file__)), "blobs")
-ENGINES = {"nam-mod": "", "extended": "extended"}      # engine name -> blobs sub folder
+ENGINES = {"nam-mod": "", "extended": "extended", "extended-fair": "extended-fair"}      # engine name -> blobs sub folder
 EVIL = "/usr/Evil/Evil"
 SCRIPT = "/usr/Evil/Scripts/evil"
 LIBS = ("libnam_hook.so", "libnam_preload.so")

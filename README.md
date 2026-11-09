@@ -79,3 +79,6 @@ tests/               python -m unittest discover -s tests      (set MX5_STOCK_EV
 ```
 
 Licenses and origins: [THIRD_PARTY.md](THIRD_PARTY.md). This project is GPL-3.0 because it contains ported nam-mod code.
+
+> `--engine extended-fair`: the Extended hook with its `SCHED_IDLE` / `nice(19)` background-thread priority neutralised (`tools/make_extended_fair.py`).
+> Reported on an MX5: plain `extended` slowed the device and skipped rigs in USB Audio 48 kHz mode; `extended-fair` is the candidate fix (untested).

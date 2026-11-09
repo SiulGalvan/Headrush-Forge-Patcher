@@ -9,8 +9,8 @@ def main(argv=None):
                                  "(NAM mod, MX5 Bridge, pedal design). Unofficial - use at your own risk.")
     ap.add_argument("--instances", type=int, choices=(2, 4), default=2,
                     help="2 = Anxiety OD hijacked, V2 untouched; 4 = Anxiety OD and Anxiety OD V2 hijacked (default 2)")
-    ap.add_argument("--engine", choices=("nam-mod", "extended"), default="nam-mod",
-                    help="NAM engine: nam-mod 0.1.6 (default, proven on MX5) or the NAM Extended build (gentler background loading)")
+    ap.add_argument("--engine", choices=("nam-mod", "extended", "extended-fair"), default="nam-mod",
+                    help="NAM engine: nam-mod 0.1.6 (default, proven on MX5), the NAM Extended build, or extended-fair (Extended without the SCHED_IDLE/nice background priority, which slowed the MX5 in USB-audio 48 kHz mode)")
     ap.add_argument("--amp", action="store_true",
                     help="EXPERIMENTAL: also make the 82 LEAD 800 Bright amp a NAM amp (needs --engine extended)")
     ap.add_argument("--no-bridge", action="store_true", help="do not add the MX5 Bridge (MX-Edit support)")
