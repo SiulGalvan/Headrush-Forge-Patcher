@@ -79,6 +79,7 @@ MIDI_BLOCK = '''    ### MX5 Bridge: USB-MIDI-Funktion (nicht kritisch) ###
       logger -t mx5bridge "USB-MIDI-Funktion konnte nicht angelegt werden"; true; } &&
 '''
 ENABLE = '    ### Enable the gadget:\n    echo ff580000.usb >UDC\n)\n'
+DAEMONS = True         # mx5forge: False = do not start the two Bridge background services (diagnostic: MX-Edit will not work)
 AUDIO_MIDI = True      # mx5forge: False = no MIDI function inside the USB-audio gadget (the stand-alone MIDI gadget stays)
 HOOK = '/usr/Evil/Scripts/mx5bridge-usb.sh'
 DBHOOK = '/usr/Evil/Scripts/mx5bridge-db.sh'
@@ -183,7 +184,7 @@ def patch_evil(text):
 def patch_runevil(text):
     anchor = 'log info "Starting application ..."\n'
     need(text.count(anchor) == 1 and 'mx5bridge' not in text, 'runevil has an unexpected layout')
-    return text.replace(anchor, DAEMON + anchor)
+    return text.replace(anchor, (DAEMON if DAEMONS else '') + anchor)   # mx5forge: DAEMONS switch
 
 
 def sqlite_binary():

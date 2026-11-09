@@ -24,12 +24,13 @@ ERRORS = (patcher.Fail, bridgepatch.PatchError, ext4.Ext4Error, qmlport.ArtError
 
 class Options:
     def __init__(self, instances=2, bridge=True, design=False, rack_dir=None, source=None, out_parent=None,
-                 log=print, progress=None, engine="nam-mod", amp=False, audio_midi=True):
+                 log=print, progress=None, engine="nam-mod", amp=False, audio_midi=True, daemons=True):
         self.instances, self.bridge, self.design = instances, bridge, design
         self.rack_dir, self.source, self.out_parent = rack_dir, source, out_parent
         self.log, self.progress = log, progress
         self.engine, self.amp = engine, amp
         self.audio_midi = audio_midi
+        self.daemons = daemons
 
 
 def label(o):
@@ -41,9 +42,9 @@ def label(o):
 
 def folder_name(o):
     if not o.instances:
-        return "HeadRush_MX5_2.7_BridgeOnly%s_Updater" % ("" if o.audio_midi else "Lite")
+        return "HeadRush_MX5_2.7_BridgeOnly%s%s_Updater" % ("" if o.audio_midi else "Lite", "" if o.daemons else "NoDaemons")
     return "HeadRush_MX5_2.7_NAM%d%s%s%s%s_Updater" % (o.instances, {"extended": "_Ext", "extended-fair": "_ExtFair"}.get(o.engine, ""), "_Amp" if o.amp else "",
-                                                   ("_Bridge" if o.audio_midi else "_BridgeLite") if o.bridge else "", "_Design" if o.design else "")
+                                                   (("_Bridge" if o.audio_midi else "_BridgeLite") + ("" if o.daemons else "NoDaemons")) if o.bridge else "", "_Design" if o.design else "")
 
 
 def config_json(o, original):
@@ -124,6 +125,7 @@ def build(o):
                     return b""
             info = None if not o.instances else "nam_mod_ref=%s via mx5forge %s\nnam_instanzen=%d\n" % ("Gigboard_NAM extended" if o.engine != "nam-mod" else "headrush-nam-mod 0.1.6", __version__, o.instances)
             bridgepatch.AUDIO_MIDI = o.audio_midi
+            bridgepatch.DAEMONS = o.daemons
             files, _ = bridgepatch.plan(cat, info, log=log, device=found["device"])
             log("MX5 Bridge: writing %d files ..." % len(files))
             for target, (data, mode) in files.items():

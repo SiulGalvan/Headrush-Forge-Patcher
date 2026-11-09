@@ -16,6 +16,8 @@ def main(argv=None):
     ap.add_argument("--no-audio-midi", action="store_true",
                     help="MX5 Bridge 'lite': no USB-MIDI function inside the USB-audio gadget (MX-Edit only connects while USB audio is idle). "
                          "Use it if USB Audio recording misbehaves")
+    ap.add_argument("--no-daemons", action="store_true",
+                    help="DIAGNOSTIC: Bridge without its two background services (MX-Edit will not connect)")
     ap.add_argument("--no-bridge", action="store_true", help="do not add the MX5 Bridge (MX-Edit support)")
     ap.add_argument("--design", action="store_true",
                     help="pedal design / chain art; Anxiety OD gets the NAM art, and with --instances 2 Anxiety OD V2 keeps its original art")
@@ -30,7 +32,7 @@ def main(argv=None):
         from . import gui
         return gui.main()
     o = pipeline.Options(a.instances, not a.no_bridge, a.design, a.rack_art, a.input, a.out or ".", engine=a.engine, amp=a.amp,
-                         audio_midi=not a.no_audio_midi)
+                         audio_midi=not a.no_audio_midi, daemons=not a.no_daemons)
     print("mx5forge %s - unofficial, use at your own risk\n" % __version__)
     try:
         out, missing = pipeline.build(o)
