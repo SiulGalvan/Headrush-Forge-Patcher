@@ -5,7 +5,7 @@ Crea en tu propio ordenador un instalador parcheado para el **HeadRush MX5 (firm
 * descarga el actualizador oficial de inMusic (o usa un archivo que ya tengas),
 * aplica el **NAM mod** (Neural Amp Modeler en el pedal Anxiety OD) con **2 o 4 instancias**,
 * añade el **MX5 Bridge** (el puente USB-MIDI que usa MX-Edit),
-* aplica opcionalmente el **diseño de pedales** (arte del pedal NAM e imágenes de pedal en la cadena), **solo en la versión de 4 instancias**,
+* aplica opcionalmente el **diseño de pedales** (arte del pedal NAM e imágenes de pedal en la cadena), con 2 instancias Anxiety OD V2 conserva su arte original; con 4 recibe la insignia NAM,
 * deja una carpeta con `FirmwareUpdater` lista para ejecutar.
 
 > No oficial. Flashear firmware modificado puede dejar el equipo inservible. Recuperación: mantén pulsados los footswitches 1 + 2 al encender y flashea el actualizador oficial. Úsalo bajo tu responsabilidad.
@@ -16,7 +16,7 @@ Crea en tu propio ordenador un instalador parcheado para el **HeadRush MX5 (firm
 |---|---|---|
 | Anxiety OD | pedal NAM | pedal NAM |
 | Anxiety OD V2 | sin tocar | pedal NAM (pierde su sonido original) |
-| Imágenes de pedales | **originales** | **diseño de pedales** opcional |
+| Imágenes de pedales | **diseño** opcional (V2 conserva su arte) | **diseño** opcional (V2 con insignia NAM) |
 | MX5 Bridge | opcional | opcional |
 
 ## Uso
@@ -37,7 +37,7 @@ Nada de HeadRush se incluye en el repositorio: la herramienta lee todo del actua
 ## Qué está probado
 
 * El parche NAM en Python reproduce byte a byte el binario Evil, las librerías y los scripts de una imagen MX5 real de 2 instancias hecha con el nam-mod original y MX-Edit (imagen que funciona en el equipo).
-* El proceso completo se ejecutó sin conexión sobre una imagen equivalente a la original con 2 instancias + Bridge y con 4 instancias + Bridge + diseño.
+* El proceso completo se ejecutó sin conexión sobre una imagen equivalente a la original con 2 + Bridge, con 2 + Bridge + diseño y con 4 + Bridge + diseño.
 * El diseño (QML + imágenes) corresponde a versiones probadas en un MX5 real.
 
 **No probado:** la descarga en línea, la interfaz gráfica (requiere tkinter) y, en el equipo, la combinación de **4 instancias con Anxiety OD V2 secuestrado y el diseño de pedales**. Se agradece que reportes resultados.

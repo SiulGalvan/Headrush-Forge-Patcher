@@ -54,8 +54,6 @@ def config_json(o, original):
 def check_options(o):
     if o.instances not in (2, 4):
         raise Fail("instances must be 2 or 4")
-    if o.design and o.instances != 4:
-        raise Fail("the pedal design is only available with 4 NAM instances (the 2-instance build keeps the original pedals)")
 
 
 def build(o):
@@ -98,7 +96,7 @@ def build(o):
         evil = bytearray(fs.cat(nam_install.EVIL))
         slot, slot2 = nam_install.hijack_evil(evil, o.instances, log)
         if o.design:
-            art_apply.apply(evil, o.rack_dir, nam_v2_badge=True, log=log)
+            art_apply.apply(evil, o.rack_dir, nam_v2_badge=(o.instances == 4), log=log)
         nam_install.install(fs, evil, slot, slot2, log)
         written = {nam_install.EVIL: bytes(evil)}
 

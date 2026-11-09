@@ -11,7 +11,7 @@ def main(argv=None):
                     help="2 = Anxiety OD hijacked, V2 untouched; 4 = Anxiety OD and Anxiety OD V2 hijacked (default 2)")
     ap.add_argument("--no-bridge", action="store_true", help="do not add the MX5 Bridge (MX-Edit support)")
     ap.add_argument("--design", action="store_true",
-                    help="pedal design / chain art (only with --instances 4; the 2-instance build keeps the original pedals)")
+                    help="pedal design / chain art; Anxiety OD gets the NAM art, and with --instances 2 Anxiety OD V2 keeps its original art")
     ap.add_argument("--rack-art", metavar="DIR", help="folder with your own pedal-shaped PNGs for the 11 rack modules")
     ap.add_argument("--input", metavar="FILE", help="official updater (.zip/.exe), folder or Update.img "
                                                     "(default: download it from inMusic)")

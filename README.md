@@ -5,7 +5,7 @@ Build a patched **HeadRush MX5 (firmware 2.7)** updater on your own computer:
 * downloads the official updater from inMusic (or uses a file you already have),
 * applies the **NAM mod** (Neural Amp Modeler on the Anxiety OD pedal) with **2 or 4 instances**,
 * adds the **MX5 Bridge** (USB-MIDI bridge used by [MX-Edit](https://github.com/)),
-* optionally applies the **pedal design** (NAM pedal art + pedal pictures in the signal chain) - **4-instance builds only**,
+* optionally applies the **pedal design** (NAM pedal art + pedal pictures in the signal chain) (with 2 instances Anxiety OD V2 keeps its original art; with 4 it gets the NAM badge),
 * writes a ready-to-run `FirmwareUpdater` folder.
 
 > Unofficial. Flashing modified firmware can brick your device. Recovery: hold footswitches 1 + 2 while powering on and flash the official updater. You do it at your own risk.
@@ -16,10 +16,10 @@ Build a patched **HeadRush MX5 (firmware 2.7)** updater on your own computer:
 |---|---|---|
 | Anxiety OD | NAM pedal | NAM pedal |
 | Anxiety OD V2 | untouched | NAM pedal (loses its original sound) |
-| Pedal pictures | **original** | optional **pedal design** |
+| Pedal pictures | optional **pedal design** (V2 keeps its original art) | optional **pedal design** (V2 gets the NAM badge) |
 | MX5 Bridge | optional | optional |
 
-The pedal design is deliberately tied to the 4-instance build: the 2-instance build keeps every original pedal.
+The pedal design works with both builds. With 2 instances only Anxiety OD gets the NAM art and Anxiety OD V2 keeps its original picture; with 4 instances V2 gets the NAM badge too.
 
 ## Use
 

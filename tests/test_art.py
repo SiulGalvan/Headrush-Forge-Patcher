@@ -16,9 +16,8 @@ EVIL = os.environ.get("MX5_STOCK_EVIL")
 
 
 class Options(unittest.TestCase):
-    def test_design_needs_four_instances(self):
-        with self.assertRaises(pipeline.Fail):
-            pipeline.check_options(pipeline.Options(instances=2, design=True))
+    def test_design_allowed_with_both(self):
+        pipeline.check_options(pipeline.Options(instances=2, design=True))
         pipeline.check_options(pipeline.Options(instances=4, design=True))
         pipeline.check_options(pipeline.Options(instances=2))
 

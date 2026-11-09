@@ -14,7 +14,7 @@ NAM model. For 4 instances the same is done for Anxiety OD V2 (its own vtable, s
 `elfpatch.hijack` refuses to continue unless the vtable slot holds the original address, the segments have the
 expected layout and the gap is zero (so it never patches twice or the wrong binary).
 
-## Pedal design (`mx5forge/art`, 4 instances only)
+## Pedal design (`mx5forge/art`)
 * `qmlport.py` takes the stock `ActiveStomp.qml` from the firmware (its sha1 is checked), applies a handful of text
   substitutions (an `Image` that shows `ModuleEditors/img/<module>.png` in the chain and in the wah/volume pedal
   frame, hiding the generic body, LED, label, footswitch and A/B badge when a picture is shown), minifies it and

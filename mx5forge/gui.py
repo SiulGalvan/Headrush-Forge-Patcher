@@ -57,7 +57,7 @@ class App(tk.Tk):
         f.pack(fill="x", **pad)
         ttk.Checkbutton(f, text="MX5 Bridge (USB-MIDI bridge for MX-Edit)", variable=self.bridge).pack(anchor="w", padx=8, pady=2)
         self.cb_design = ttk.Checkbutton(f, text="Pedal design: NAM pedal art + pedal pictures in the signal chain "
-                                                 "(only with 4 instances)", variable=self.design, command=self._sync)
+                                                 "(with 2 instances Anxiety OD V2 keeps its original art)", variable=self.design, command=self._sync)
         self.cb_design.pack(anchor="w", padx=8, pady=2)
         row = ttk.Frame(f)
         row.pack(fill="x", padx=24, pady=2)
@@ -98,11 +98,7 @@ class App(tk.Tk):
                   foreground="#a00").pack(anchor="w", **pad)
 
     def _sync(self):
-        four = self.instances.get() == 4
-        if not four:
-            self.design.set(False)
-        self.cb_design.state(["!disabled"] if four else ["disabled"])
-        on = four and self.design.get()
+        on = self.design.get()
         for w in (self.e_racks, self.b_racks):
             w.state(["!disabled"] if on else ["disabled"])
         for w in (self.e_src, self.b_src):
