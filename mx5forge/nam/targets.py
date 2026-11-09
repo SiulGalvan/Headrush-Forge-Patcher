@@ -12,3 +12,12 @@ MX5 = {
     "v2_engine_vtable_vaddr": 0x17EE4DC,
     "v2_orig_process_fn": 0x302ED0,
 }
+
+# NAM AMP (NAM Extended): AmpCab, the class behind every amplifier block ("82 LEAD 800 Bright" is the one the
+# hook acts on). Found through the RTTI of the MX5 2.7 Evil (same method that reproduces the two pedal vtables
+# above); process() sits in slot 7 and uses the object offsets the Gigboard hook expects (0x94ec, 0x9548, 0x95a5, 0x9500...).
+MX5.update({
+    "amp_engine_vtable_vaddr": 0x15E737C,
+    "amp_orig_process_fn": 0x139538,
+    "amp_process_slot": 7,
+})

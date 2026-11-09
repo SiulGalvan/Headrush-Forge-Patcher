@@ -2,7 +2,7 @@
 import os as _os
 import sys as _sys
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 HERE = _os.path.dirname(_os.path.abspath(__file__))
 # MX-Edit's firmware modules (MIT) import each other as top-level modules
 VENDOR = _os.path.join(HERE, "vendor", "mxedit")

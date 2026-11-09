@@ -30,3 +30,10 @@ expected layout and the gap is zero (so it never patches twice or the wrong bina
 ## MX5 Bridge (`vendor/mxedit`)
 Unmodified MX-Edit 0.9.5 code (`bridgepatch.py`): USB MIDI function, `mx5bridge-*.sh`, an ARM `sqlite3`, and the
 MIDI assignment QML files. It reads the NAM launcher line, so it runs after the NAM step.
+
+## NAM amp (experimental, `--amp`)
+`AmpCab` is the DSP class behind every amplifier block. Its vtable was located through the RTTI of the MX5 2.7 Evil
+(`N8EvilDSPs6AmpCabE` -> typeinfo -> vtable `0x15e737c`; the same method returns exactly the known Anxiety OD / V2 vtables).
+Slot 7 holds `process()` (`0x139538`). A third trampoline redirects it to `nam_process_amp` of the Extended hook, which only acts
+when the block's amp model is "82 LEAD 800 Bright" and otherwise calls the original function. The launcher passes
+`NAM_HOOK_SLOT_AMP_ADDR` and `NAM_ORIG_AMP_PROCESS_ADDR=0x139538` (the hook's built-in default is the Gigboard address).

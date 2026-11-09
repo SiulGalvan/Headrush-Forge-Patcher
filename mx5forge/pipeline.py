@@ -24,18 +24,21 @@ ERRORS = (patcher.Fail, bridgepatch.PatchError, ext4.Ext4Error, qmlport.ArtError
 
 class Options:
     def __init__(self, instances=2, bridge=True, design=False, rack_dir=None, source=None, out_parent=None,
-                 log=print, progress=None):
+                 log=print, progress=None, engine="nam-mod", amp=False):
         self.instances, self.bridge, self.design = instances, bridge, design
         self.rack_dir, self.source, self.out_parent = rack_dir, source, out_parent
         self.log, self.progress = log, progress
+        self.engine, self.amp = engine, amp
 
 
 def label(o):
-    return "NAM x%d%s%s" % (o.instances, " + MX5 Bridge" if o.bridge else "", " + pedal design" if o.design else "")
+    return "NAM x%d%s%s%s%s" % (o.instances, " Extended" if o.engine == "extended" else "", " + NAM amp" if o.amp else "",
+                                " + MX5 Bridge" if o.bridge else "", " + pedal design" if o.design else "")
 
 
 def folder_name(o):
-    return "HeadRush_MX5_2.7_NAM%d%s%s_Updater" % (o.instances, "_Bridge" if o.bridge else "", "_Design" if o.design else "")
+    return "HeadRush_MX5_2.7_NAM%d%s%s%s%s_Updater" % (o.instances, "_Ext" if o.engine == "extended" else "", "_Amp" if o.amp else "",
+                                                   "_Bridge" if o.bridge else "", "_Design" if o.design else "")
 
 
 def config_json(o, original):
@@ -54,6 +57,10 @@ def config_json(o, original):
 def check_options(o):
     if o.instances not in (2, 4):
         raise Fail("instances must be 2 or 4")
+    if o.engine not in nam_install.ENGINES:
+        raise Fail("engine must be one of: " + ", ".join(nam_install.ENGINES))
+    if o.amp and o.engine != "extended":
+        raise Fail("the NAM amp block needs the Extended engine")
 
 
 def build(o):
@@ -94,10 +101,10 @@ def build(o):
         fs.check()
 
         evil = bytearray(fs.cat(nam_install.EVIL))
-        slot, slot2 = nam_install.hijack_evil(evil, o.instances, log)
+        slot, slot2, slot_amp = nam_install.hijack_evil(evil, o.instances, log, amp=o.amp)
         if o.design:
             art_apply.apply(evil, o.rack_dir, nam_v2_badge=(o.instances == 4), log=log)
-        nam_install.install(fs, evil, slot, slot2, log)
+        nam_install.install(fs, evil, slot, slot2, log, engine=o.engine, slot_amp_hex=slot_amp)
         written = {nam_install.EVIL: bytes(evil)}
 
         if o.bridge:
@@ -106,7 +113,7 @@ def build(o):
                     return fs.cat(p)
                 except FileNotFoundError:
                     return b""
-            info = "nam_mod_ref=headrush-nam-mod 0.1.6 via mx5forge %s\nnam_instanzen=%d\n" % (__version__, o.instances)
+            info = "nam_mod_ref=%s via mx5forge %s\nnam_instanzen=%d\n" % ("Gigboard_NAM extended" if o.engine == "extended" else "headrush-nam-mod 0.1.6", __version__, o.instances)
             files, _ = bridgepatch.plan(cat, info, log=log, device=found["device"])
             log("MX5 Bridge: writing %d files ..." % len(files))
             for target, (data, mode) in files.items():

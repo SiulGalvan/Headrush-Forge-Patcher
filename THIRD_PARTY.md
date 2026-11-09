@@ -11,3 +11,10 @@
 
 Not included and never to be added: any HeadRush/inMusic firmware, binary, QML or picture. The tool reads them
 from the official updater on the user's own computer and patches them there.
+
+## Additions in 0.2.0
+
+| Component | Origin | License | Notes |
+|---|---|---|---|
+| `mx5forge/nam/blobs/extended/libnam_hook.so`, `libnam_preload.so` | Gigboard_NAM (NAM Extended) build output | GPL-3 | sources in `nam_source_extended/` (nam_hook.cpp, nam_preload.cpp, build scripts); NeuralAmpModelerCore (MIT) is fetched by `fetch_nam_core.sh` |
+| `mx5forge/vendor/mxedit/bridgepatch.py` | MX-Edit 0.9.5 | MIT | **one modified line**: the launcher regex also accepts `NAM_HOOK_SLOT_AMP_ADDR` / `NAM_ORIG_AMP_PROCESS_ADDR` |

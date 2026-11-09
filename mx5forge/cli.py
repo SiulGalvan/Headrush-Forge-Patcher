@@ -9,6 +9,10 @@ def main(argv=None):
                                  "(NAM mod, MX5 Bridge, pedal design). Unofficial - use at your own risk.")
     ap.add_argument("--instances", type=int, choices=(2, 4), default=2,
                     help="2 = Anxiety OD hijacked, V2 untouched; 4 = Anxiety OD and Anxiety OD V2 hijacked (default 2)")
+    ap.add_argument("--engine", choices=("nam-mod", "extended"), default="nam-mod",
+                    help="NAM engine: nam-mod 0.1.6 (default, proven on MX5) or the NAM Extended build (gentler background loading)")
+    ap.add_argument("--amp", action="store_true",
+                    help="EXPERIMENTAL: also make the 82 LEAD 800 Bright amp a NAM amp (needs --engine extended)")
     ap.add_argument("--no-bridge", action="store_true", help="do not add the MX5 Bridge (MX-Edit support)")
     ap.add_argument("--design", action="store_true",
                     help="pedal design / chain art; Anxiety OD gets the NAM art, and with --instances 2 Anxiety OD V2 keeps its original art")
@@ -22,7 +26,7 @@ def main(argv=None):
     if a.gui:
         from . import gui
         return gui.main()
-    o = pipeline.Options(a.instances, not a.no_bridge, a.design, a.rack_art, a.input, a.out or ".")
+    o = pipeline.Options(a.instances, not a.no_bridge, a.design, a.rack_art, a.input, a.out or ".", engine=a.engine, amp=a.amp)
     print("mx5forge %s - unofficial, use at your own risk\n" % __version__)
     try:
         out, missing = pipeline.build(o)

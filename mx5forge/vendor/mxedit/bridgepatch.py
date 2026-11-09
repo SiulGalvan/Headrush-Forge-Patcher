@@ -142,7 +142,7 @@ def patch_ms_remove(text):
 EVIL_START = '\tsystemd-inhibit --what=handle-power-key /usr/Evil/Evil\n'
 EVIL_RUN = re.compile(r'\tsystemd-inhibit --what=handle-power-key '
                       r'(env LD_PRELOAD=/usr/Evil/libnam_preload\.so'
-                      r'(?: NAM_HOOK_SLOT_GONK(?:_V2)?_ADDR=0x[0-9a-f]+)+ )?'
+                      r'(?: NAM_(?:HOOK_SLOT_GONK(?:_V2)?_ADDR|HOOK_SLOT_AMP_ADDR|ORIG_AMP_PROCESS_ADDR)=0x[0-9a-f]+)+ )?'   # mx5forge: also the NAM Extended amp variables
                       r'/usr/Evil/Evil\n\texitCode=\$\?\n')
 NAM_BLOCK = '# --- NAM mod ---\n'
 NAM_LIBS = ('/usr/Evil/libnam_preload.so', '/usr/Evil/libnam_hook.so')

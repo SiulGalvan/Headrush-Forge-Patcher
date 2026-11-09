@@ -26,7 +26,7 @@ class LauncherError(Exception):
     pass
 
 
-def build(stock_text, hook_slot_hex, hook_slot_v2_hex=None):
+def build(stock_text, hook_slot_hex, hook_slot_v2_hex=None, hook_slot_amp_hex=None, amp_orig_hex=None):
     comment = NAM_START + DESC + TAIL + NAM_END
     s = stock_text.find(NAM_START)
     e = stock_text.find(NAM_END, s) if s >= 0 else -1
@@ -44,5 +44,8 @@ def build(stock_text, hook_slot_hex, hook_slot_v2_hex=None):
            "NAM_HOOK_SLOT_GONK_ADDR=" + hook_slot_hex)
     if hook_slot_v2_hex:
         new += " NAM_HOOK_SLOT_GONK_V2_ADDR=" + hook_slot_v2_hex
+    if hook_slot_amp_hex:
+        # the Extended hook falls back to the Gigboard address of the original amp process() unless told otherwise
+        new += " NAM_HOOK_SLOT_AMP_ADDR=" + hook_slot_amp_hex + " NAM_ORIG_AMP_PROCESS_ADDR=" + amp_orig_hex
     new += " /usr/Evil/Evil"
     return script[:i] + new + script[i + len(OLD_EXEC):]

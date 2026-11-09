@@ -19,6 +19,12 @@ Crea en tu propio ordenador un instalador parcheado para el **HeadRush MX5 (firm
 | Imágenes de pedales | **diseño** opcional (V2 conserva su arte) | **diseño** opcional (V2 con insignia NAM) |
 | MX5 Bridge | opcional | opcional |
 
+## Motores NAM y amp NAM (0.2.0)
+
+* `--engine nam-mod` (por defecto): las librerías del nam-mod 0.1.6, probadas en un MX5.
+* `--engine extended`: las librerías del NAM Extended. La inferencia es la misma; cambian los hilos de fondo (`SCHED_IDLE`, pausas cortas al construir y precalentar un modelo) para evitar glitches al cargar o cambiar de modelo. Sin probar en un MX5. En un equipo de un solo núcleo la carga en segundo plano solo avanza cuando el audio deja CPU libre; con 4 modelos pesados podría tardar: se agradece que reportes.
+* `--amp` (**experimental**, requiere `--engine extended`): secuestra también la clase `AmpCab`, de modo que el bloque de amplificador **82 LEAD 800 Bright** ejecuta un modelo NAM (Gain / Presence / Master, Bass / Mid / Treble, Depth = selector de modelo, Bright = filtro paso altos). Las direcciones del MX5 se derivaron del Evil 2.7 del MX5 (vtable `0x15e737c`, process() `0x139538`, slot 7) y se comprobaron en el desensamblado los offsets del objeto que usa el hook, pero el ID de modelo de amp que busca el hook (27 o 37) y el camino de audio solo se verificaron en Gigboard. No se aplica arte ni renombrado del amp. Nunca se ha ejecutado en un MX5.
+
 ## Uso
 
 ```bash
@@ -26,6 +32,7 @@ pip install -r requirements.txt          # Pillow (la interfaz necesita tkinter)
 python -m mx5forge                       # interfaz gráfica
 python -m mx5forge --instances 4 --design --rack-art ./mis_racks --out ./salida
 python -m mx5forge --instances 2 --no-bridge --input FirmwareUpdater_MX5.zip
+python -m mx5forge --instances 4 --engine extended --amp   # experimental
 ```
 
 Después ejecuta `FirmwareUpdater.exe` desde la carpeta de salida (si la herramienta indica que faltan `FirmwareUpdater.exe`,

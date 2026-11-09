@@ -16,7 +16,7 @@ class ElfPatchError(Exception):
     pass
 
 
-def hijack(data, tramp, engine_vtable, orig_fn):
+def hijack(data, tramp, engine_vtable, orig_fn, slot=PROCESS_SLOT):
     """Patch `data` (bytearray, the Evil binary) in place. Returns (hook_slot_addr, trampoline_vaddr).
     Refuses (ElfPatchError) if anything does not look exactly like the expected stock binary."""
     if len(tramp) != 32:
@@ -38,7 +38,7 @@ def hijack(data, tramp, engine_vtable, orig_fn):
     for i in range(e_phnum):
         phdrs.append(list(struct.unpack_from("<8I", data, e_phoff + i * e_phentsize)))
     # fields: type, offset, vaddr, paddr, filesz, memsz, flags, align
-    slot_vaddr = engine_vtable + PROCESS_SLOT * 4
+    slot_vaddr = engine_vtable + slot * 4
     slot_off = slot_vaddr - VADDR_BASE
     if slot_off + 4 > len(data):
         raise ElfPatchError("vtable slot file offset out of bounds")

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "headrush-mx5-forge"
-version = "0.1.0"
+version = "0.2.0"
 description = "Build a patched HeadRush MX5 2.7 firmware updater: NAM mod (2 or 4 instances), MX5 Bridge, pedal design"
 readme = "README.md"
 license = { text = "GPL-3.0-only" }
@@ -21,4 +21,4 @@ mx5forge = "mx5forge.cli:main"
 include = ["mx5forge*"]
 
 [tool.setuptools.package-data]
-mx5forge = ["nam/blobs/*", "art/assets/*", "art/*.json", "vendor/mxedit/mod/*", "vendor/mxedit/bin/*", "vendor/mxedit/LICENSE"]
+mx5forge = ["nam/blobs/*", "nam/blobs/extended/*", "art/assets/*", "art/*.json", "vendor/mxedit/mod/*", "vendor/mxedit/bin/*", "vendor/mxedit/LICENSE"]

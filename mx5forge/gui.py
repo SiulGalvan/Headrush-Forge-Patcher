@@ -32,6 +32,8 @@ class App(tk.Tk):
         self.instances = tk.IntVar(value=2)
         self.bridge = tk.BooleanVar(value=True)
         self.design = tk.BooleanVar(value=False)
+        self.engine = tk.StringVar(value="nam-mod")
+        self.amp = tk.BooleanVar(value=False)
         self.own_file = tk.BooleanVar(value=False)
         self.src = tk.StringVar()
         self.racks = tk.StringVar()
@@ -52,6 +54,16 @@ class App(tk.Tk):
                                 "art stay as they are", variable=self.instances, value=2, command=self._sync).pack(anchor="w", padx=8, pady=2)
         ttk.Radiobutton(f, text="Up to 4 instances - Anxiety OD and Anxiety OD V2 both become NAM pedals "
                                 "(V2 loses its original sound)", variable=self.instances, value=4, command=self._sync).pack(anchor="w", padx=8, pady=2)
+
+        f = ttk.LabelFrame(self, text="NAM engine")
+        f.pack(fill="x", **pad)
+        ttk.Radiobutton(f, text="nam-mod 0.1.6 (proven on the MX5)", variable=self.engine, value="nam-mod",
+                        command=self._sync).pack(anchor="w", padx=8, pady=2)
+        ttk.Radiobutton(f, text="NAM Extended (gentler background loading; not yet tested on an MX5)", variable=self.engine,
+                        value="extended", command=self._sync).pack(anchor="w", padx=8, pady=2)
+        self.cb_amp = ttk.Checkbutton(f, text="EXPERIMENTAL: NAM amp block (82 LEAD 800 Bright) - Extended only, never run on an MX5",
+                                      variable=self.amp)
+        self.cb_amp.pack(anchor="w", padx=24, pady=2)
 
         f = ttk.LabelFrame(self, text="Add-ons")
         f.pack(fill="x", **pad)
@@ -98,6 +110,9 @@ class App(tk.Tk):
                   foreground="#a00").pack(anchor="w", **pad)
 
     def _sync(self):
+        if self.engine.get() != "extended":
+            self.amp.set(False)
+        self.cb_amp.state(["!disabled"] if self.engine.get() == "extended" else ["disabled"])
         on = self.design.get()
         for w in (self.e_racks, self.b_racks):
             w.state(["!disabled"] if on else ["disabled"])
@@ -125,7 +140,7 @@ class App(tk.Tk):
             return
         o = pipeline.Options(self.instances.get(), self.bridge.get(), self.design.get(), self.racks.get() or None,
                              self.src.get() or None if self.own_file.get() else None, self.out.get(),
-                             self._say, self._progress)
+                             self._say, self._progress, engine=self.engine.get(), amp=self.amp.get())
         if self.own_file.get() and not o.source:
             messagebox.showerror("MX5 Forge", "Choose the firmware file.")
             return

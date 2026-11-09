@@ -80,3 +80,28 @@ class Launcher(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class ExtendedAndAmp(unittest.TestCase):
+    def test_options(self):
+        from mx5forge import pipeline
+        with self.assertRaises(pipeline.Fail):
+            pipeline.check_options(pipeline.Options(amp=True))                       # amp needs the extended engine
+        with self.assertRaises(pipeline.Fail):
+            pipeline.check_options(pipeline.Options(engine="nope"))
+        pipeline.check_options(pipeline.Options(engine="extended", amp=True))
+        self.assertEqual(pipeline.folder_name(pipeline.Options(4, True, True, engine="extended", amp=True)),
+                         "HeadRush_MX5_2.7_NAM4_Ext_Amp_Bridge_Design_Updater")
+
+    def test_launcher_amp(self):
+        from mx5forge.nam import launcher
+        stock = "x\nwhile [ 1 ]\ndo\n systemd-inhibit --what=handle-power-key /usr/Evil/Evil\ndone\n"
+        s = launcher.build(stock, "0x10", "0x14", "0x18", "0x139538")
+        self.assertIn("NAM_HOOK_SLOT_GONK_ADDR=0x10 NAM_HOOK_SLOT_GONK_V2_ADDR=0x14 NAM_HOOK_SLOT_AMP_ADDR=0x18 "
+                      "NAM_ORIG_AMP_PROCESS_ADDR=0x139538 /usr/Evil/Evil", s)
+
+    def test_blobs(self):
+        from mx5forge.nam import install
+        for e in install.ENGINES:
+            for n in install.LIBS:
+                self.assertGreater(len(install.blob(n, e)), 1000)

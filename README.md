@@ -21,6 +21,17 @@ Build a patched **HeadRush MX5 (firmware 2.7)** updater on your own computer:
 
 The pedal design works with both builds. With 2 instances only Anxiety OD gets the NAM art and Anxiety OD V2 keeps its original picture; with 4 instances V2 gets the NAM badge too.
 
+## NAM engines and the NAM amp (0.2.0)
+
+* `--engine nam-mod` (default): the nam-mod 0.1.6 libraries, the ones proven on an MX5.
+* `--engine extended`: the NAM Extended libraries. The inference code is the same; the differences are gentler background threads
+  (`SCHED_IDLE`, small sleeps while a model is built / warmed up) to avoid glitches when loading or switching a model.
+  Not tested on an MX5. On a single-core device the background loading only advances when the audio thread leaves CPU free, so with 4 heavy models loading may be slow - please report.
+* `--amp` (**experimental**, needs `--engine extended`): also hijacks the amp class `AmpCab`, so the **82 LEAD 800 Bright** amp block runs a NAM model
+  (Gain / Presence / Master, Bass / Mid / Treble, Depth = model selector, Bright = tight-cut HPF). The MX5 addresses were derived from the MX5 2.7 Evil
+  (vtable `0x15e737c`, process() `0x139538`, slot 7) and the object offsets used by the hook were checked in the disassembly, but the amp model id the hook looks for
+  (27 or 37) and the audio path were only verified on a Gigboard. No amp art / rename is applied. It has never run on an MX5.
+
 ## Use
 
 ```bash
@@ -28,6 +39,7 @@ pip install -r requirements.txt          # Pillow (GUI needs tkinter, part of th
 python -m mx5forge                       # graphical interface
 python -m mx5forge --instances 4 --design --rack-art ./my_racks --out ./out     # command line
 python -m mx5forge --instances 2 --no-bridge --input FirmwareUpdater_MX5.zip
+python -m mx5forge --instances 4 --engine extended --amp   # experimental
 ```
 
 Then run `FirmwareUpdater.exe` from the output folder (copy it, `libusb-1.0.dll` and `Background.png` from the official
@@ -60,6 +72,7 @@ mx5forge/            application (cli.py, gui.py, pipeline.py)
   nam/               NAM hijack: elfpatch.py, launcher.py, blobs/ (nam-mod 0.1.6 build output)
   art/               pedal design: qmlport.py, images.py, apply.py, manifest_mx5_2.7.json, assets/
   vendor/mxedit/     MX-Edit firmware tools (MIT): ext4, FIT, xz, 7z, download, MX5 Bridge
+nam_source_extended/ sources of the NAM Extended libraries (GPL)
 nam_source_patch/    sources of libnam_hook / libnam_preload (from nam-mod, GPL)  - to rebuild the blobs
 nam_build_scripts/   build scripts of nam-mod for those blobs
 tests/               python -m unittest discover -s tests      (set MX5_STOCK_EVIL=... for the art tests)
