@@ -33,6 +33,7 @@ class App(tk.Tk):
         self.bridge = tk.BooleanVar(value=True)
         self.design = tk.BooleanVar(value=False)
         self.engine = tk.StringVar(value="nam-mod")
+        self.audio_midi = tk.BooleanVar(value=False)
         self.amp = tk.BooleanVar(value=False)
         self.own_file = tk.BooleanVar(value=False)
         self.src = tk.StringVar()
@@ -70,6 +71,8 @@ class App(tk.Tk):
         f = ttk.LabelFrame(self, text="Add-ons")
         f.pack(fill="x", **pad)
         ttk.Checkbutton(f, text="MX5 Bridge (USB-MIDI bridge for MX-Edit)", variable=self.bridge).pack(anchor="w", padx=8, pady=2)
+        ttk.Checkbutton(f, text="MX-Edit also while USB audio is active (can slow the device when recording)",
+                        variable=self.audio_midi).pack(anchor="w", padx=24, pady=2)
         self.cb_design = ttk.Checkbutton(f, text="Pedal design: NAM pedal art + pedal pictures in the signal chain "
                                                  "(with 2 instances Anxiety OD V2 keeps its original art)", variable=self.design, command=self._sync)
         self.cb_design.pack(anchor="w", padx=8, pady=2)
@@ -143,7 +146,8 @@ class App(tk.Tk):
             return
         o = pipeline.Options(self.instances.get(), self.bridge.get(), self.design.get(), self.racks.get() or None,
                              self.src.get() or None if self.own_file.get() else None, self.out.get(),
-                             self._say, self._progress, engine=self.engine.get(), amp=self.amp.get())
+                             self._say, self._progress, engine=self.engine.get(), amp=self.amp.get(),
+                                audio_midi=self.audio_midi.get())
         if self.own_file.get() and not o.source:
             messagebox.showerror("MX5 Forge", "Choose the firmware file.")
             return

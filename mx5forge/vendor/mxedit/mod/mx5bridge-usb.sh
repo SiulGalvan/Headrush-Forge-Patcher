@@ -71,6 +71,7 @@ evil-begin)
 	touch "$FLAG"
 	gadget_down
 	flock -u 9
+#@PROBE@
 	;;
 evil-end)
 	exec 9>"$LOCK"

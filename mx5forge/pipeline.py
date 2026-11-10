@@ -24,13 +24,14 @@ ERRORS = (patcher.Fail, bridgepatch.PatchError, ext4.Ext4Error, qmlport.ArtError
 
 class Options:
     def __init__(self, instances=2, bridge=True, design=False, rack_dir=None, source=None, out_parent=None,
-                 log=print, progress=None, engine="nam-mod", amp=False, audio_midi=True, daemons=True):
+                 log=print, progress=None, engine="nam-mod", amp=False, audio_midi=False, daemons=True, probe=False):
         self.instances, self.bridge, self.design = instances, bridge, design
         self.rack_dir, self.source, self.out_parent = rack_dir, source, out_parent
         self.log, self.progress = log, progress
         self.engine, self.amp = engine, amp
         self.audio_midi = audio_midi
         self.daemons = daemons
+        self.probe = probe
 
 
 def label(o):
@@ -126,6 +127,7 @@ def build(o):
             info = None if not o.instances else "nam_mod_ref=%s via mx5forge %s\nnam_instanzen=%d\n" % ("Gigboard_NAM extended" if o.engine != "nam-mod" else "headrush-nam-mod 0.1.6", __version__, o.instances)
             bridgepatch.AUDIO_MIDI = o.audio_midi
             bridgepatch.DAEMONS = o.daemons
+            bridgepatch.PROBE = o.probe
             files, _ = bridgepatch.plan(cat, info, log=log, device=found["device"])
             log("MX5 Bridge: writing %d files ..." % len(files))
             for target, (data, mode) in files.items():

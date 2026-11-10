@@ -91,7 +91,7 @@ class ExtendedAndAmp(unittest.TestCase):
             pipeline.check_options(pipeline.Options(engine="nope"))
         pipeline.check_options(pipeline.Options(engine="extended", amp=True))
         self.assertEqual(pipeline.folder_name(pipeline.Options(4, True, True, engine="extended", amp=True)),
-                         "HeadRush_MX5_2.7_NAM4_Ext_Amp_Bridge_Design_Updater")
+                         "HeadRush_MX5_2.7_NAM4_Ext_Amp_BridgeLite_Design_Updater")
 
     def test_launcher_amp(self):
         from mx5forge.nam import launcher

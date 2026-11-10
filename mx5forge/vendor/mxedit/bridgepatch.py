@@ -80,6 +80,34 @@ MIDI_BLOCK = '''    ### MX5 Bridge: USB-MIDI-Funktion (nicht kritisch) ###
 '''
 ENABLE = '    ### Enable the gadget:\n    echo ff580000.usb >UDC\n)\n'
 DAEMONS = True         # mx5forge: False = do not start the two Bridge background services (diagnostic: MX-Edit will not work)
+PROBE = False          # mx5forge: True = diagnostic build that records load figures 15-75 s after USB audio starts
+PROBE_CODE = r'''	if [ "$2" = audio ]; then
+		(
+			sleep 15
+			i=0
+			while [ $i -lt 4 ]; do
+				for d in /media/az01-internal/Evil/usb_mnt/MX5Bridge /media/az01-internal/Evil/mx5bridge; do
+					mkdir -p "$d" 2>/dev/null || continue
+					{
+						echo "=== probe +$((15 + i * 20)) s  $(date)"
+						cat /proc/loadavg
+						top -b -n 1 2>&1 | head -n 25
+						echo "--- interrupts"
+						grep -i -E "usb|dwc|mmc|ff58" /proc/interrupts
+						echo "--- gadget"
+						ls /sys/kernel/config/usb_gadget/g1/functions /sys/kernel/config/usb_gadget/g1/configs/c.1
+						cat /proc/asound/cards
+						echo "--- dmesg"
+						dmesg | tail -n 30
+						echo
+					} >> "$d/probe.txt" 2>&1
+				done
+				i=$((i + 1))
+				sleep 20
+			done
+		) >/dev/null 2>&1 9>&- 8>&- &
+	fi
+'''
 AUDIO_MIDI = True      # mx5forge: False = no MIDI function inside the USB-audio gadget (the stand-alone MIDI gadget stays)
 HOOK = '/usr/Evil/Scripts/mx5bridge-usb.sh'
 DBHOOK = '/usr/Evil/Scripts/mx5bridge-db.sh'
@@ -101,7 +129,7 @@ def need(cond, msg):
 def mod_text(name, device='MX5'):
     """Datei aus mod/ mit eingesetzter Version und Geraetename."""
     text = open(os.path.join(MOD, name), encoding='ascii').read()
-    text = text.replace('@VERSION@', VERSION).replace('@DEVICE@', device)
+    text = text.replace('@VERSION@', VERSION).replace('@DEVICE@', device).replace('#@PROBE@\n', PROBE_CODE if PROBE else '')
     assert '@VERSION@' not in text and '@DEVICE@' not in text
     return text
 
