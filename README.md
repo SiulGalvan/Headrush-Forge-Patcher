@@ -83,6 +83,7 @@ Licenses and origins: [THIRD_PARTY.md](THIRD_PARTY.md). This project is GPL-3.0 
 > `--engine extended-fair`: the Extended hook with its `SCHED_IDLE` / `nice(19)` background-thread priority neutralised (`tools/make_extended_fair.py`).
 > Reported on an MX5: plain `extended` slowed the device and skipped rigs in USB Audio 48 kHz mode; `extended-fair` is the candidate fix (untested).
 
-> **Bridge and USB audio.** By default the Bridge no longer adds its USB-MIDI function to the USB-audio gadget ("lite"): on the tested MX5, that function made the device
-> slow down when recording over USB audio at 48 kHz, while the lite build did not. MX-Edit then connects only while USB audio is idle.
-> `--audio-midi` (GUI checkbox) restores the old behaviour.
+> **Bridge and USB audio.** On the tested MX5, the Bridge's USB-MIDI function inside the USB-audio gadget made the device slow down when recording over USB audio at **48 kHz**
+> (about 110,000 USB interrupts per second instead of about 8,000), but not at 44.1 kHz. `--audio-midi auto` (default) therefore adds that function at every rate except 48 kHz,
+> `on` always adds it (original Bridge) and `off` never ('lite'). With the function missing, MX-Edit connects only while USB audio is idle. The rate is the first argument of
+> `usb-otg-audio-start.sh`; only 44.1 and 48 kHz have been tried.

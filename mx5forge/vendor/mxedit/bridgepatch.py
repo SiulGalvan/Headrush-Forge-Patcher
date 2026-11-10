@@ -78,6 +78,13 @@ MIDI_BLOCK = '''    ### MX5 Bridge: USB-MIDI-Funktion (nicht kritisch) ###
         ln -s functions/midi.mx5bridge configs/c.1 ) ||
       logger -t mx5bridge "USB-MIDI-Funktion konnte nicht angelegt werden"; true; } &&
 '''
+MIDI_BLOCK_AUTO = '''    ### MX5 Bridge: USB-MIDI-Funktion (nicht kritisch), nicht bei 48 kHz (mx5forge) ###
+    { if [ "$1" != 48000 ]; then ( mkdir -p functions/midi.mx5bridge &&
+        echo 1 >functions/midi.mx5bridge/in_ports &&
+        echo 1 >functions/midi.mx5bridge/out_ports &&
+        ln -s functions/midi.mx5bridge configs/c.1 ) ||
+      logger -t mx5bridge "USB-MIDI-Funktion konnte nicht angelegt werden"; fi; true; } &&
+'''
 ENABLE = '    ### Enable the gadget:\n    echo ff580000.usb >UDC\n)\n'
 DAEMONS = True         # mx5forge: False = do not start the two Bridge background services (diagnostic: MX-Edit will not work)
 PROBE = False          # mx5forge: True = diagnostic build that records load figures 15-75 s after USB audio starts
@@ -89,7 +96,7 @@ PROBE_COPY = r'''	if [ -f /media/az01-internal/Evil/mx5bridge/probe.csv ] && usb
 		mkdir -p "$DIR" && cp /media/az01-internal/Evil/mx5bridge/probe*.* "$DIR/" && sync
 	fi
 '''
-AUDIO_MIDI = True      # mx5forge: False = no MIDI function inside the USB-audio gadget (the stand-alone MIDI gadget stays)
+AUDIO_MIDI = True      # mx5forge: True = MIDI function inside the USB-audio gadget, False = none (stand-alone MIDI gadget stays), 'auto' = except at 48 kHz
 HOOK = '/usr/Evil/Scripts/mx5bridge-usb.sh'
 DBHOOK = '/usr/Evil/Scripts/mx5bridge-db.sh'
 SQLITE_TARGET = '/usr/Evil/Scripts/mx5bridge-sqlite3'
@@ -122,7 +129,7 @@ def patch_start(text):
     mp = 'modprobe configfs &&\n'
     need(text.count(mp) == 1, 'USB start script has an unexpected layout')
     text = text.replace(mp, '%s evil-begin audio\n' % HOOK + mp)
-    return text.replace(ENABLE, (MIDI_BLOCK if AUDIO_MIDI else '') + ENABLE)   # mx5forge: AUDIO_MIDI switch
+    return text.replace(ENABLE, (MIDI_BLOCK_AUTO if AUDIO_MIDI == 'auto' else MIDI_BLOCK if AUDIO_MIDI else '') + ENABLE)   # mx5forge: AUDIO_MIDI switch
 
 
 def patch_stop(text):

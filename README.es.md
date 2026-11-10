@@ -50,3 +50,5 @@ Nada de HeadRush se incluye en el repositorio: la herramienta lee todo del actua
 **No probado:** la descarga en línea, la interfaz gráfica (requiere tkinter) y, en el equipo, la combinación de **4 instancias con Anxiety OD V2 secuestrado y el diseño de pedales**. Se agradece que reportes resultados.
 
 Licencias y orígenes: [THIRD_PARTY.md](THIRD_PARTY.md). El proyecto es GPL-3.0 porque incluye código portado del nam-mod.
+
+> **Bridge y audio USB.** En el MX5 probado, la función USB-MIDI del Bridge dentro del dispositivo de audio USB ralentizaba el equipo al grabar a **48 kHz** (unas 110.000 interrupciones USB por segundo en lugar de unas 8.000), pero no a 44,1 kHz. Por eso `--audio-midi auto` (por defecto) añade esa función a todas las frecuencias salvo 48 kHz; `on` la añade siempre (Bridge original) y `off` nunca (versión «lite»). Sin la función, MX-Edit solo conecta mientras el audio USB está inactivo. Solo se han probado 44,1 y 48 kHz.

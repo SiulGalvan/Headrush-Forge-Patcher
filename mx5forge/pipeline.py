@@ -22,14 +22,17 @@ ERRORS = (patcher.Fail, bridgepatch.PatchError, ext4.Ext4Error, qmlport.ArtError
           nam_install.elfpatch.ElfPatchError, ValueError, OSError)
 
 
+MIDI_TAG = {"on": "", "off": "Lite", "auto": "Auto"}
+
+
 class Options:
     def __init__(self, instances=2, bridge=True, design=False, rack_dir=None, source=None, out_parent=None,
-                 log=print, progress=None, engine="nam-mod", amp=False, audio_midi=False, daemons=True, probe=False):
+                 log=print, progress=None, engine="nam-mod", amp=False, audio_midi="auto", daemons=True, probe=False):
         self.instances, self.bridge, self.design = instances, bridge, design
         self.rack_dir, self.source, self.out_parent = rack_dir, source, out_parent
         self.log, self.progress = log, progress
         self.engine, self.amp = engine, amp
-        self.audio_midi = audio_midi
+        self.audio_midi = {True: "on", False: "off"}.get(audio_midi, audio_midi)   # on / off / auto
         self.daemons = daemons
         self.probe = probe
 
@@ -43,9 +46,9 @@ def label(o):
 
 def folder_name(o):
     if not o.instances:
-        return "HeadRush_MX5_2.7_BridgeOnly%s%s_Updater" % ("" if o.audio_midi else "Lite", "" if o.daemons else "NoDaemons")
+        return "HeadRush_MX5_2.7_BridgeOnly%s%s_Updater" % (MIDI_TAG[o.audio_midi], "" if o.daemons else "NoDaemons")
     return "HeadRush_MX5_2.7_NAM%d%s%s%s%s_Updater" % (o.instances, {"extended": "_Ext", "extended-fair": "_ExtFair"}.get(o.engine, ""), "_Amp" if o.amp else "",
-                                                   (("_Bridge" if o.audio_midi else "_BridgeLite") + ("" if o.daemons else "NoDaemons")) if o.bridge else "", "_Design" if o.design else "")
+                                                   (("_Bridge" + MIDI_TAG[o.audio_midi]) + ("" if o.daemons else "NoDaemons")) if o.bridge else "", "_Design" if o.design else "")
 
 
 def config_json(o, original):
@@ -66,6 +69,8 @@ def check_options(o):
         raise Fail("instances must be 0 (no NAM, diagnostic), 2 or 4")
     if o.instances == 0 and (o.design or o.amp or not o.bridge):
         raise Fail("0 NAM instances is a diagnostic build: only the MX5 Bridge can be applied")
+    if o.audio_midi not in MIDI_TAG:
+        raise Fail("audio_midi must be on, off or auto")
     if o.engine not in nam_install.ENGINES:
         raise Fail("engine must be one of: " + ", ".join(nam_install.ENGINES))
     if o.amp and o.engine == "nam-mod":
@@ -125,7 +130,7 @@ def build(o):
                 except FileNotFoundError:
                     return b""
             info = None if not o.instances else "nam_mod_ref=%s via mx5forge %s\nnam_instanzen=%d\n" % ("Gigboard_NAM extended" if o.engine != "nam-mod" else "headrush-nam-mod 0.1.6", __version__, o.instances)
-            bridgepatch.AUDIO_MIDI = o.audio_midi
+            bridgepatch.AUDIO_MIDI = {"on": True, "off": False, "auto": "auto"}[o.audio_midi]
             bridgepatch.DAEMONS = o.daemons
             bridgepatch.PROBE = o.probe
             files, _ = bridgepatch.plan(cat, info, log=log, device=found["device"])
