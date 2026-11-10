@@ -84,6 +84,6 @@ Licenses and origins: [THIRD_PARTY.md](THIRD_PARTY.md). This project is GPL-3.0 
 > Reported on an MX5: plain `extended` slowed the device and skipped rigs in USB Audio 48 kHz mode; `extended-fair` is the candidate fix (untested).
 
 > **Bridge and USB audio.** On the tested MX5, the Bridge's USB-MIDI function inside the USB-audio gadget made the device slow down when recording over USB audio at **48 kHz**
-> (about 110,000 USB interrupts per second instead of about 8,000), but not at 44.1 kHz. `--audio-midi auto` (default) therefore adds that function at every rate except 48 kHz,
+> (about 110,000 USB interrupts per second instead of about 8,000), but not at 44.1 kHz. `--audio-midi auto` (default) therefore adds that function at every rate except 48 kHz and 96 kHz (96 kHz is treated like 48 kHz by request, it has not been measured),
 > `on` always adds it (original Bridge) and `off` never ('lite'). With the function missing, MX-Edit connects only while USB audio is idle. The rate is the first argument of
-> `usb-otg-audio-start.sh`; only 44.1 and 48 kHz have been tried.
+> `usb-otg-audio-start.sh`; only 44.1 and 48 kHz have been measured.

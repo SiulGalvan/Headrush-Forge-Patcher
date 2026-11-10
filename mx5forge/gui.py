@@ -71,7 +71,7 @@ class App(tk.Tk):
         f = ttk.LabelFrame(self, text="Add-ons")
         f.pack(fill="x", **pad)
         ttk.Checkbutton(f, text="MX5 Bridge (USB-MIDI bridge for MX-Edit)", variable=self.bridge).pack(anchor="w", padx=8, pady=2)
-        for txt, val in (("MX-Edit during USB audio: all rates except 48 kHz (recommended)", "auto"),
+        for txt, val in (("MX-Edit during USB audio: all rates except 48/96 kHz (recommended)", "auto"),
                          ("MX-Edit during USB audio: always (slows the device at 48 kHz on the tested MX5)", "on"),
                          ("MX-Edit only while USB audio is idle", "off")):
             ttk.Radiobutton(f, text=txt, variable=self.audio_midi, value=val).pack(anchor="w", padx=24, pady=1)

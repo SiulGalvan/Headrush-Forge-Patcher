@@ -22,4 +22,4 @@ from the official updater on the user's own computer and patches them there.
 | `mx5forge/vendor/mxedit/bridgepatch.py` (2nd change) | MX-Edit 0.9.5 | MIT | module switch `AUDIO_MIDI` (default True = unchanged behaviour) to omit the MIDI function inside the USB-audio gadget |
 | `mx5forge/vendor/mxedit/bridgepatch.py` (3rd change) | MX-Edit 0.9.5 | MIT | module switch `DAEMONS` (default True = unchanged) for diagnostic builds |
 | `mx5forge/vendor/mxedit/bridgepatch.py` + `mod/mx5bridge-usb.sh` (4th change) | MX-Edit 0.9.5 | MIT | `PROBE` switch / `#@PROBE@` marker for a diagnostic build |
-| `mx5forge/vendor/mxedit/bridgepatch.py` (5th change) | MX-Edit 0.9.5 | MIT | `AUDIO_MIDI = 'auto'`: MIDI function in the audio gadget except at 48 kHz |
+| `mx5forge/vendor/mxedit/bridgepatch.py` (5th change) | MX-Edit 0.9.5 | MIT | `AUDIO_MIDI = 'auto'`: MIDI function in the audio gadget except at 48 and 96 kHz |

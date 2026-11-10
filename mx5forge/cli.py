@@ -15,7 +15,7 @@ def main(argv=None):
                     help="EXPERIMENTAL: also make the 82 LEAD 800 Bright amp a NAM amp (needs --engine extended)")
     ap.add_argument("--audio-midi", choices=("auto", "on", "off"), default="auto",
                     help="MX5 Bridge: USB-MIDI function inside the USB-audio gadget (MX-Edit while USB audio is active). "
-                         "auto (default) = on except at 48 kHz, on one MX5 it slowed the device when recording at 48 kHz; on = always (original Bridge); "
+                         "auto (default) = on except at 48 and 96 kHz (the 48 kHz family slowed the device on one MX5); on = always (original Bridge); "
                          "off = never ('lite')")
     ap.add_argument("--probe", action="store_true", help="DIAGNOSTIC: record load figures after USB audio starts (probe.txt on the USB drive)")
     ap.add_argument("--no-daemons", action="store_true",
