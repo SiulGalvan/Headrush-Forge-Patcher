@@ -86,7 +86,7 @@ PROBE_CODE = r'''	if [ "$2" = audio ]; then
 			sleep 15
 			i=0
 			while [ $i -lt 4 ]; do
-				for d in /media/az01-internal/Evil/usb_mnt/MX5Bridge /media/az01-internal/Evil/mx5bridge; do
+				for d in /media/az01-internal/Evil/mx5bridge; do
 					mkdir -p "$d" 2>/dev/null || continue
 					{
 						echo "=== probe +$((15 + i * 20)) s  $(date)"
@@ -106,6 +106,10 @@ PROBE_CODE = r'''	if [ "$2" = audio ]; then
 				sleep 20
 			done
 		) >/dev/null 2>&1 9>&- 8>&- &
+	fi
+'''
+PROBE_COPY = r'''	if [ -f /media/az01-internal/Evil/mx5bridge/probe.txt ] && usb_mnt_ok; then
+		mkdir -p "$DIR" && cp /media/az01-internal/Evil/mx5bridge/probe.txt "$DIR/probe.txt" && sync
 	fi
 '''
 AUDIO_MIDI = True      # mx5forge: False = no MIDI function inside the USB-audio gadget (the stand-alone MIDI gadget stays)
@@ -129,7 +133,7 @@ def need(cond, msg):
 def mod_text(name, device='MX5'):
     """Datei aus mod/ mit eingesetzter Version und Geraetename."""
     text = open(os.path.join(MOD, name), encoding='ascii').read()
-    text = text.replace('@VERSION@', VERSION).replace('@DEVICE@', device).replace('#@PROBE@\n', PROBE_CODE if PROBE else '')
+    text = text.replace('@VERSION@', VERSION).replace('@DEVICE@', device).replace('#@PROBE@\n', PROBE_CODE if PROBE else '').replace('#@PROBECOPY@\n', PROBE_COPY if PROBE else '')
     assert '@VERSION@' not in text and '@DEVICE@' not in text
     return text
 

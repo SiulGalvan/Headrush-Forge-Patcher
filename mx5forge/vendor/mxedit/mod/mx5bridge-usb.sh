@@ -98,6 +98,7 @@ daemon)
 		} > "$DIR/firmware_aktiv.txt"
 		sync
 	fi
+#@PROBECOPY@
 	flock -u 9
 	if [ -e "$OFF_SWITCH" ]; then
 		log "abgeschaltet durch $OFF_SWITCH"
