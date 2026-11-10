@@ -81,35 +81,12 @@ MIDI_BLOCK = '''    ### MX5 Bridge: USB-MIDI-Funktion (nicht kritisch) ###
 ENABLE = '    ### Enable the gadget:\n    echo ff580000.usb >UDC\n)\n'
 DAEMONS = True         # mx5forge: False = do not start the two Bridge background services (diagnostic: MX-Edit will not work)
 PROBE = False          # mx5forge: True = diagnostic build that records load figures 15-75 s after USB audio starts
-PROBE_CODE = r'''	if [ "$2" = audio ]; then
-		(
-			sleep 15
-			i=0
-			while [ $i -lt 4 ]; do
-				for d in /media/az01-internal/Evil/mx5bridge; do
-					mkdir -p "$d" 2>/dev/null || continue
-					{
-						echo "=== probe +$((15 + i * 20)) s  $(date)"
-						cat /proc/loadavg
-						top -b -n 1 2>&1 | head -n 25
-						echo "--- interrupts"
-						grep -i -E "usb|dwc|mmc|ff58" /proc/interrupts
-						echo "--- gadget"
-						ls /sys/kernel/config/usb_gadget/g1/functions /sys/kernel/config/usb_gadget/g1/configs/c.1
-						cat /proc/asound/cards
-						echo "--- dmesg"
-						dmesg | tail -n 30
-						echo
-					} >> "$d/probe.txt" 2>&1
-				done
-				i=$((i + 1))
-				sleep 20
-			done
-		) >/dev/null 2>&1 9>&- 8>&- &
+PROBE_CODE = r'''	if [ "$2" = audio ] && [ -x /usr/Evil/Scripts/mx5bridge-probe.sh ]; then
+		setsid /usr/Evil/Scripts/mx5bridge-probe.sh >/dev/null 2>&1 </dev/null 9>&- 8>&- &
 	fi
 '''
-PROBE_COPY = r'''	if [ -f /media/az01-internal/Evil/mx5bridge/probe.txt ] && usb_mnt_ok; then
-		mkdir -p "$DIR" && cp /media/az01-internal/Evil/mx5bridge/probe.txt "$DIR/probe.txt" && sync
+PROBE_COPY = r'''	if [ -f /media/az01-internal/Evil/mx5bridge/probe.csv ] && usb_mnt_ok; then
+		mkdir -p "$DIR" && cp /media/az01-internal/Evil/mx5bridge/probe*.* "$DIR/" && sync
 	fi
 '''
 AUDIO_MIDI = True      # mx5forge: False = no MIDI function inside the USB-audio gadget (the stand-alone MIDI gadget stays)
@@ -253,6 +230,8 @@ def plan(cat, nam_info=None, log=print, device=None):
     files['/usr/Evil/Scripts/mx5bridge-diag.sh'] = (enc(mod_text('mx5bridge-diag.sh')), 0o100755)
     files['/usr/Evil/Scripts/mx5bridge-usb.sh'] = (enc(mod_text('mx5bridge-usb.sh', device)), 0o100755)
     files[DBHOOK] = (enc(mod_text('mx5bridge-db.sh')), 0o100755)
+    if PROBE:
+        files['/usr/Evil/Scripts/mx5bridge-probe.sh'] = (enc(mod_text('mx5bridge-probe.sh')), 0o100755)
     files[SQLITE_TARGET] = (sqlite_binary(), 0o100755)
     for target, fn in (('/usr/Evil/Scripts/setup-mass-storage.sh', patch_ms_setup),
                        ('/usr/Evil/Scripts/remove-mass-storage.sh', patch_ms_remove),
@@ -281,6 +260,6 @@ def plan(cat, nam_info=None, log=print, device=None):
     for target, (data, mode) in files.items():
         if target.endswith(('.sh', '.qml')) or target.endswith(('runevil', '/evil')):
             need(b'\r' not in data, 'CRLF in ' + target)
-        if target in (DBHOOK, SQLITE_TARGET, NAM_INFO) or '/Assignments/' in target:
+        if target in (DBHOOK, SQLITE_TARGET, NAM_INFO, '/usr/Evil/Scripts/mx5bridge-probe.sh') or '/Assignments/' in target:
             need(cat(target) == b'', 'already exists: ' + target)
     return files, nam
