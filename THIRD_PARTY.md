@@ -23,3 +23,5 @@ from the official updater on the user's own computer and patches them there.
 | `mx5forge/vendor/mxedit/bridgepatch.py` (3rd change) | MX-Edit 0.9.5 | MIT | module switch `DAEMONS` (default True = unchanged) for diagnostic builds |
 | `mx5forge/vendor/mxedit/bridgepatch.py` + `mod/mx5bridge-usb.sh` (4th change) | MX-Edit 0.9.5 | MIT | `PROBE` switch / `#@PROBE@` marker for a diagnostic build |
 | `mx5forge/vendor/mxedit/bridgepatch.py` (5th change) | MX-Edit 0.9.5 | MIT | `AUDIO_MIDI = 'auto'`: MIDI function in the audio gadget except at 48 and 96 kHz |
+
+mx5forge change to the vendored ext4.py: `_data_runs` now also handles extent trees of depth > 0 (stock firmware files can be fragmented) and returns their index blocks so they are freed when a file is replaced.

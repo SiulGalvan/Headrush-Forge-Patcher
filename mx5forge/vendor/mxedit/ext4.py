@@ -153,6 +153,18 @@ class Ext4:
                 out.extend(self._extents(self.block((hi << 32) | lo)))
         return out
 
+    def _extent_index_blocks(self, iblock):
+        """Physical blocks of the inner nodes/leaves of an extent tree with depth > 0 (mx5forge)."""
+        magic, entries, _, depth = struct.unpack_from("<HHHH", iblock, 0)
+        out = []
+        if depth:
+            for i in range(entries):
+                _, lo, hi, _ = struct.unpack_from("<IIHH", iblock, 12 + 12 * i)
+                blk = (hi << 32) | lo
+                out.append(blk)
+                out.extend(self._extent_index_blocks(self.block(blk)))
+        return out
+
     def _blockmap(self, iblock):
         """Klassische Blockzeiger (ext2/3-Stil, z. B. von libext2fs ohne Extents geschrieben,
         so legt das Werkzeug der NAM-Mod Dateien an). Liefert (Datenbloecke [(logisch,
@@ -188,9 +200,7 @@ class Ext4:
         flags = struct.unpack_from("<I", ino, 0x20)[0]
         iblock = ino[0x28:0x28 + 60]
         if flags & EXTENTS_FL:
-            if struct.unpack_from("<H", iblock, 6)[0] != 0:
-                raise Ext4Error("Extent-Baum mit Tiefe > 0 wird nicht unterstuetzt")
-            return self._extents(iblock), []
+            return self._extents(iblock), self._extent_index_blocks(iblock)
         data, meta = self._blockmap(iblock)
         return self._merge(data), meta
 
