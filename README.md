@@ -87,3 +87,9 @@ Licenses and origins: [THIRD_PARTY.md](THIRD_PARTY.md). This project is GPL-3.0 
 > (about 110,000 USB interrupts per second instead of about 8,000), but not at 44.1 kHz. `--audio-midi auto` (default) therefore adds that function at every rate except 48 kHz and 96 kHz (96 kHz is treated like 48 kHz by request, it has not been measured),
 > `on` always adds it (original Bridge) and `off` never ('lite'). With the function missing, MX-Edit connects only while USB audio is idle. The rate is the first argument of
 > `usb-otg-audio-start.sh`; only 44.1 and 48 kHz have been measured.
+
+## Windows executable (.exe)
+
+- **Nothing to install:** on GitHub open *Actions* → workflow *build* → *Run workflow*, then download the `mx5forge-windows-latest` artifact (contains `mx5forge.exe`).
+- **On your PC:** install Python 3.9+ (with tcl/tk, "Add to PATH") and double-click `build_windows.bat`; the result is `dist\mx5forge.exe`.
+- Double-clicking the `.exe` opens the GUI where the modules are selected. The official firmware is downloaded by the program itself and is not bundled.

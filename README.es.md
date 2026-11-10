@@ -52,3 +52,9 @@ Nada de HeadRush se incluye en el repositorio: la herramienta lee todo del actua
 Licencias y orígenes: [THIRD_PARTY.md](THIRD_PARTY.md). El proyecto es GPL-3.0 porque incluye código portado del nam-mod.
 
 > **Bridge y audio USB.** En el MX5 probado, la función USB-MIDI del Bridge dentro del dispositivo de audio USB ralentizaba el equipo al grabar a **48 kHz** (unas 110.000 interrupciones USB por segundo en lugar de unas 8.000), pero no a 44,1 kHz. Por eso `--audio-midi auto` (por defecto) añade esa función a todas las frecuencias salvo 48 y 96 kHz (96 kHz se trata como 48 kHz por petición, no se ha medido); `on` la añade siempre (Bridge original) y `off` nunca (versión «lite»). Sin la función, MX-Edit solo conecta mientras el audio USB está inactivo. Solo se han medido 44,1 y 48 kHz.
+
+## Ejecutable de Windows (.exe)
+
+- **Sin instalar nada:** en GitHub, pestaña *Actions* → workflow *build* → *Run workflow*. Al terminar, descarga el artefacto `mx5forge-windows-latest` (contiene `mx5forge.exe`).
+- **En tu PC:** instala Python 3.9+ (con tcl/tk y "Add to PATH") y haz doble clic en `build_windows.bat`; el resultado queda en `dist\mx5forge.exe`.
+- Doble clic en el `.exe` abre la interfaz gráfica, donde eliges los módulos (NAM 2/4, motor, Bridge, diseño…). Sin ventana, `mx5forge.exe --help` muestra la línea de comandos. El firmware oficial lo descarga el propio programa; no va incluido.
