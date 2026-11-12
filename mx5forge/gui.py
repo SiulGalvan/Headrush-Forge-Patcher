@@ -26,7 +26,8 @@ class App(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("HeadRush MX5 Forge %s" % __version__)
-        self.minsize(640, 640)
+        self.minsize(660, 560)
+        self.geometry("720x760")
         self.q = queue.Queue()
         self.busy = False
         self.model = tk.StringVar(value="mx5")
@@ -46,24 +47,46 @@ class App(tk.Tk):
 
     def _ui(self):
         pad = dict(padx=10, pady=4)
-        ttk.Label(self, text="HeadRush MX5 - firmware 2.7", font=("TkDefaultFont", 13, "bold")).pack(anchor="w", **pad)
-        ttk.Label(self, text="Builds a patched copy of the official updater on your own computer. Nothing from "
+        # fixed area at the bottom (button, progress, log) packed first so it always stays visible;
+        # the settings above it live in a scrollable canvas
+        bottom = ttk.Frame(self)
+        bottom.pack(side="bottom", fill="x")
+        outer = ttk.Frame(self)
+        outer.pack(side="top", fill="both", expand=True)
+        canvas = tk.Canvas(outer, highlightthickness=0)
+        sb = ttk.Scrollbar(outer, orient="vertical", command=canvas.yview)
+        canvas.configure(yscrollcommand=sb.set)
+        sb.pack(side="right", fill="y")
+        canvas.pack(side="left", fill="both", expand=True)
+        body = ttk.Frame(canvas)
+        win = canvas.create_window((0, 0), window=body, anchor="nw")
+        body.bind("<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
+        canvas.bind("<Configure>", lambda e: canvas.itemconfigure(win, width=e.width))
+
+        def wheel(e):
+            if e.widget is self.log:
+                return
+            canvas.yview_scroll(-1 if (getattr(e, "delta", 0) > 0 or e.num == 4) else 1, "units")
+        for ev in ("<MouseWheel>", "<Button-4>", "<Button-5>"):
+            self.bind_all(ev, wheel)
+        ttk.Label(body, text="HeadRush MX5 / Pedalboard - firmware 2.7", font=("TkDefaultFont", 13, "bold")).pack(anchor="w", **pad)
+        ttk.Label(body, text="Builds a patched copy of the official updater on your own computer. Nothing from "
                              "HeadRush is shipped with this tool.", wraplength=600).pack(anchor="w", **pad)
 
-        f = ttk.LabelFrame(self, text="Device (only used when the official firmware is downloaded)")
+        f = ttk.LabelFrame(body, text="Device (only used when the official firmware is downloaded)")
         f.pack(fill="x", **pad)
         ttk.Radiobutton(f, text="HeadRush MX5", variable=self.model, value="mx5").pack(anchor="w", padx=8, pady=2)
         ttk.Radiobutton(f, text="HeadRush Pedalboard (EXPERIMENTAL - never run on real hardware)",
                         variable=self.model, value="pedalboard").pack(anchor="w", padx=8, pady=2)
 
-        f = ttk.LabelFrame(self, text="NAM mod")
+        f = ttk.LabelFrame(body, text="NAM mod")
         f.pack(fill="x", **pad)
         ttk.Radiobutton(f, text="2 instances - Anxiety OD becomes the NAM pedal; Anxiety OD V2 and the original pedal "
                                 "art stay as they are", variable=self.instances, value=2, command=self._sync).pack(anchor="w", padx=8, pady=2)
         ttk.Radiobutton(f, text="Up to 4 instances - Anxiety OD and Anxiety OD V2 both become NAM pedals "
                                 "(V2 loses its original sound)", variable=self.instances, value=4, command=self._sync).pack(anchor="w", padx=8, pady=2)
 
-        f = ttk.LabelFrame(self, text="NAM engine")
+        f = ttk.LabelFrame(body, text="NAM engine")
         f.pack(fill="x", **pad)
         ttk.Radiobutton(f, text="nam-mod 0.1.6 (proven on the MX5)", variable=self.engine, value="nam-mod",
                         command=self._sync).pack(anchor="w", padx=8, pady=2)
@@ -75,7 +98,7 @@ class App(tk.Tk):
                                       variable=self.amp)
         self.cb_amp.pack(anchor="w", padx=24, pady=2)
 
-        f = ttk.LabelFrame(self, text="Add-ons")
+        f = ttk.LabelFrame(body, text="Add-ons")
         f.pack(fill="x", **pad)
         ttk.Checkbutton(f, text="MX5 Bridge (USB-MIDI bridge for MX-Edit)", variable=self.bridge).pack(anchor="w", padx=8, pady=2)
         for txt, val in (("MX-Edit during USB audio: all rates except 48/96 kHz (recommended)", "auto"),
@@ -95,7 +118,7 @@ class App(tk.Tk):
         self.b_racks = ttk.Button(r2, text="Browse...", command=lambda: self._pick_dir(self.racks))
         self.b_racks.pack(side="left", padx=4)
 
-        f = ttk.LabelFrame(self, text="Official firmware")
+        f = ttk.LabelFrame(body, text="Official firmware")
         f.pack(fill="x", **pad)
         ttk.Checkbutton(f, text="Use a file I already have (updater .zip/.exe, folder or Update.img) "
                                 "- otherwise it is downloaded from inMusic", variable=self.own_file, command=self._sync).pack(anchor="w", padx=8, pady=2)
@@ -106,22 +129,23 @@ class App(tk.Tk):
         self.b_src = ttk.Button(r3, text="Browse...", command=self._pick_file)
         self.b_src.pack(side="left", padx=4)
 
-        f = ttk.LabelFrame(self, text="Output folder")
+        f = ttk.LabelFrame(body, text="Output folder")
         f.pack(fill="x", **pad)
         r4 = ttk.Frame(f)
         r4.pack(fill="x", padx=8, pady=4)
         ttk.Entry(r4, textvariable=self.out).pack(side="left", fill="x", expand=True)
         ttk.Button(r4, text="Browse...", command=lambda: self._pick_dir(self.out)).pack(side="left", padx=4)
 
-        self.btn = ttk.Button(self, text="Build updater", command=self._start)
+        self.btn = ttk.Button(bottom, text="Build updater", command=self._start)
         self.btn.pack(**pad)
-        self.bar = ttk.Progressbar(self, mode="determinate", maximum=100)
+        self.bar = ttk.Progressbar(bottom, mode="determinate", maximum=100)
         self.bar.pack(fill="x", **pad)
-        self.log = tk.Text(self, height=12, state="disabled", wrap="word")
-        self.log.pack(fill="both", expand=True, **pad)
-        ttk.Label(self, text="Unofficial. Flashing modified firmware can brick your device - at your own risk. "
+        self.log = tk.Text(bottom, height=8, state="disabled", wrap="word")
+        self.log.pack(fill="x", **pad)
+        ttk.Label(bottom, text="Unofficial. Flashing modified firmware can brick your device - at your own risk. "
                              "Recovery: hold footswitches 1 + 2 while powering on.", wraplength=600,
                   foreground="#a00").pack(anchor="w", **pad)
+
 
     def _sync(self):
         ext = self.engine.get() != "nam-mod"

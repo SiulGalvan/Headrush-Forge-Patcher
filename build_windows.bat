@@ -7,6 +7,7 @@ python -m PyInstaller --noconfirm --onefile --windowed --name mx5forge ^
   --add-data "mx5forge\nam\blobs;mx5forge\nam\blobs" ^
   --add-data "mx5forge\art\assets;mx5forge\art\assets" ^
   --add-data "mx5forge\art\manifest_mx5_2.7.json;mx5forge\art" ^
+  --add-data "mx5forge\art\manifest_pedalboard_2.7.json;mx5forge\art" ^
   --add-data "mx5forge\vendor\mxedit;mx5forge\vendor\mxedit" ^
   packaging\entry.py || goto :err
 echo.
