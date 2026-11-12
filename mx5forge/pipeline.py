@@ -1,4 +1,4 @@
-"""Build a patched MX5 2.7 firmware updater: NAM mod (2 or 4 instances), MX5 Bridge, pedal design."""
+"""Build a patched HeadRush 2.7 firmware updater (MX5; Pedalboard experimental): NAM mod (2 or 4 instances), Bridge, pedal design."""
 import hashlib
 import json
 import lzma
@@ -16,6 +16,8 @@ import xzblocks
 from .art import apply as art_apply
 from .art import qmlport
 from .nam import install as nam_install
+from .nam import revert as nam_revert
+from .nam import targets
 
 Fail = patcher.Fail
 ERRORS = (patcher.Fail, bridgepatch.PatchError, ext4.Ext4Error, qmlport.ArtError, nam_install.launcher.LauncherError,
@@ -23,11 +25,14 @@ ERRORS = (patcher.Fail, bridgepatch.PatchError, ext4.Ext4Error, qmlport.ArtError
 
 
 MIDI_TAG = {"on": "", "off": "Lite", "auto": "Auto"}
+DEVICE = {"mx5": "MX5", "pedalboard": "Pedalboard"}
+SUPPORTED = tuple(DEVICE)
 
 
 class Options:
     def __init__(self, instances=2, bridge=True, design=False, rack_dir=None, source=None, out_parent=None,
-                 log=print, progress=None, engine="nam-mod", amp=False, audio_midi="auto", daemons=True, probe=False):
+                 log=print, progress=None, engine="nam-mod", amp=False, audio_midi="auto", daemons=True, probe=False, model="mx5"):
+        self.model = model
         self.instances, self.bridge, self.design = instances, bridge, design
         self.rack_dir, self.source, self.out_parent = rack_dir, source, out_parent
         self.log, self.progress = log, progress
@@ -39,15 +44,15 @@ class Options:
 
 def label(o):
     if not o.instances:
-        return "MX5 Bridge only (no NAM)"
+        return "%s Bridge only (no NAM)" % DEVICE[o.model]
     return "NAM x%d%s%s%s%s" % (o.instances, {"extended": " Extended", "extended-fair": " Extended (fair)"}.get(o.engine, ""), " + NAM amp" if o.amp else "",
-                                " + MX5 Bridge" if o.bridge else "", " + pedal design" if o.design else "")
+                                " + %s Bridge" % DEVICE[o.model] if o.bridge else "", " + pedal design" if o.design else "")
 
 
 def folder_name(o):
     if not o.instances:
-        return "HeadRush_MX5_2.7_BridgeOnly%s%s_Updater" % (MIDI_TAG[o.audio_midi], "" if o.daemons else "NoDaemons")
-    return "HeadRush_MX5_2.7_NAM%d%s%s%s%s_Updater" % (o.instances, {"extended": "_Ext", "extended-fair": "_ExtFair"}.get(o.engine, ""), "_Amp" if o.amp else "",
+        return "HeadRush_%s_2.7_BridgeOnly%s%s_Updater" % (DEVICE[o.model], MIDI_TAG[o.audio_midi], "" if o.daemons else "NoDaemons")
+    return "HeadRush_%s_2.7_NAM%d%s%s%s%s_Updater" % (DEVICE[o.model], o.instances, {"extended": "_Ext", "extended-fair": "_ExtFair"}.get(o.engine, ""), "_Amp" if o.amp else "",
                                                    (("_Bridge" + MIDI_TAG[o.audio_midi]) + ("" if o.daemons else "NoDaemons")) if o.bridge else "", "_Design" if o.design else "")
 
 
@@ -56,10 +61,10 @@ def config_json(o, original):
     title = label(o)
     cfg = json.loads(original) if original else {"config": {}}
     c = cfg.setdefault("config", {})
-    c["appName"] = "HeadRush MX5 v2.7 + %s (unofficial)" % title
+    c["appName"] = "HeadRush %s v2.7 + %s (unofficial)" % (DEVICE[o.model], title)
     c["startButtonText"] = "Install %s" % title
     if not original:
-        c.update({"deviceName": "HeadRush MX5", "notConnectedTitle": "HEADRUSH MX5 IS NOT DETECTED",
+        c.update({"deviceName": "HeadRush " + DEVICE[o.model], "notConnectedTitle": "HEADRUSH %s IS NOT DETECTED" % DEVICE[o.model].upper(),
                   "allowUpdateOnBattery": True, "forceUpdate": False})
     return json.dumps(cfg, indent=4, ensure_ascii=False) + "\n"
 
@@ -75,6 +80,8 @@ def check_options(o):
         raise Fail("engine must be one of: " + ", ".join(nam_install.ENGINES))
     if o.amp and o.engine == "nam-mod":
         raise Fail("the NAM amp block needs the Extended engine")
+    if o.model not in SUPPORTED:
+        raise Fail("model must be one of: " + ", ".join(SUPPORTED))
 
 
 def build(o):
@@ -83,7 +90,7 @@ def build(o):
     patcher.LOG[0] = log
     if o.progress:
         patcher.PROGRESS[0] = o.progress
-    model = bridgepatch.model("mx5")
+    model = bridgepatch.model(o.model)
     base = o.out_parent or patcher.BASE
     work = tempfile.mkdtemp(prefix="mx5forge_")
     try:
@@ -101,11 +108,21 @@ def build(o):
         if not fitpatch.verify(raw):
             raise Fail("Update.img is damaged (checksum mismatch)")
         found = patcher.model_of(raw)
+        if found["key"] not in SUPPORTED:
+            raise Fail("This firmware is for the HeadRush %s - this tool builds for the MX5 and the Pedalboard only." % found["device"])
+        if found["key"] != o.model:
+            if o.source:
+                log("The firmware file is for the HeadRush %s - building for that device." % found["device"])
+                o.model = found["key"]
+                check_options(o)
+            else:
+                raise Fail("Downloaded firmware does not match the chosen device.")
+        target = targets.for_model(found["key"])
         if found["key"] != "mx5":
-            raise Fail("This firmware is for the HeadRush %s - this tool builds for the MX5 only." % found["device"])
+            log("NOTE: the HeadRush %s build has not been run on real hardware yet." % found["device"])
         sha = hashlib.sha1(raw).hexdigest()
         if sha == found["sha1"]:
-            log("Found the official HeadRush MX5 2.7 firmware.")
+            log("Found the official HeadRush %s 2.7 firmware." % found["device"])
         else:
             log("Update.img sha1 %s is not the official 2.7 firmware - the build refuses anything that does not "
                 "match exactly what it patches." % sha[:12])
@@ -117,10 +134,17 @@ def build(o):
         written = {}
         if o.instances:
             evil = bytearray(fs.cat(nam_install.EVIL))
-            slot, slot2, slot_amp = nam_install.hijack_evil(evil, o.instances, log, amp=o.amp)
+            script = fs.cat(nam_install.SCRIPT).decode()
+            if nam_revert.is_modded_script(script) or nam_revert.is_modded_evil(evil, target):
+                log("This firmware already carries the nam-mod 0.1.6 hijack - taking it out first, then applying everything again.")
+                if nam_revert.is_modded_evil(evil, target):
+                    evil = nam_revert.revert_evil(evil, target)
+                if nam_revert.is_modded_script(script):
+                    script = nam_revert.revert_script(script)
+            slot, slot2, slot_amp = nam_install.hijack_evil(evil, o.instances, log, target=target, amp=o.amp)
             if o.design:
-                art_apply.apply(evil, o.rack_dir, nam_v2_badge=(o.instances == 4), log=log)
-            nam_install.install(fs, evil, slot, slot2, log, engine=o.engine, slot_amp_hex=slot_amp)
+                art_apply.apply(evil, o.rack_dir, nam_v2_badge=(o.instances == 4), log=log, model=o.model)
+            nam_install.install(fs, evil, slot, slot2, log, engine=o.engine, slot_amp_hex=slot_amp, target=target, stock_text=script)
             written[nam_install.EVIL] = bytes(evil)
 
         if o.bridge:
@@ -176,9 +200,11 @@ def build(o):
 
 
 def hint(o, out):
+    dev = DEVICE[o.model]
+    rec = bridgepatch.model(o.model)["recovery"] or "see the HeadRush manual"
     return ("To install:\n"
-            "  1. Connect the MX5 to power and USB.\n"
-            "  2. On the MX5: Global Settings > ... (more) > Firmware Update.\n"
+            "  1. Connect the %s to power and USB.\n"
+            "  2. On the %s: Global Settings > ... (more) > Firmware Update.\n"
             "  3. Run FirmwareUpdater.exe in %s and click \"Install %s\".\n"
             "     Do not disconnect until it has finished.\n"
-            "  Recovery: hold footswitches 1 + 2 while powering on, then flash the official updater." % (out, label(o)))
+            "  Recovery: %s, then flash the official updater." % (dev, dev, out, label(o), rec))

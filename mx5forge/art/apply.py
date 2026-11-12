@@ -12,15 +12,15 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ASSETS = os.path.join(HERE, "assets")
 
 
-def load_manifest():
-    return json.load(open(os.path.join(HERE, "manifest_mx5_2.7.json")))
+def load_manifest(model="mx5"):
+    return json.load(open(os.path.join(HERE, "manifest_%s_2.7.json" % model)))
 
 
-def apply(evil, rack_dir=None, nam_v2_badge=True, log=print):
+def apply(evil, rack_dir=None, nam_v2_badge=True, log=print, model="mx5"):
     """Patch ActiveStomp.qml, replace the pedal PNGs and bypass the precompiled QML unit.
     Everything is checked against the manifest of the MX5 2.7 firmware first; nothing is written if the
     binary is not exactly that firmware."""
-    man = load_manifest()
+    man = load_manifest(model)
     q = man["qml"]
     orig = bytes(evil)
     qp = q["blob_off"]
@@ -43,7 +43,7 @@ def apply(evil, rack_dir=None, nam_v2_badge=True, log=print):
         nam["Anxiety OD V2"] = os.path.join(ASSETS, "nam_badge_v2.png")
     pngs = images.build(orig, man, rack_dir, nam, log)
 
-    z, qml = qmlport.fit(qmlport.port(stock.decode()), q["stock_clen"])
+    z, qml = qmlport.fit(qmlport.port(stock.decode(), model), q["stock_clen"])
     evil[qp - 4:qp] = struct.pack(">I", len(qml))
     evil[qp:qp + q["stock_clen"]] = z
     evil[hits[0] + 64] = ord("X")

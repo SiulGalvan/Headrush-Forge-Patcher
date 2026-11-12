@@ -45,7 +45,7 @@ property real k: std ? 1 : Math.min((wah ? 127 : 153) / (implicitWidth || 1), 22
 width: implicitWidth * k
 height: implicitHeight * k
 x: 89.5 - width / 2 + (std ? 0.5 : 0)
-y: (wah ? 257 : 255) + (std ? 19 - height : -113 - height / 2)
+y: (wah ? @WAHY@ : 255) + (std ? 19 - height : -113 - height / 2)
 source: (activeFx.visible || activePedal.visible) && signalChainModule.type > 0 ? "../../Pages/ModuleEditors/img/" + signalChainModule.moduleTypeName.replace(" 2", "") + ".png" : ""
 visible: aw && status === Image.Ready
 }
@@ -65,7 +65,14 @@ LED = ('source: signalChainModule.active ? "../../img/FXModule_Active_5_StompSwi
        ': "../../img/FXModule_Bypassed_3_StompSwitchLED.png"\n')
 
 
-def port(stock_qml):
+# Pedalboard 2.7 (Evil.isMG01()): same structure, other formatting, qrc:/ paths and the expression-pedal body is
+# drawn 5 px higher (y -15 instead of -10), so the wah art sits 5 px higher too (WAHY 252 instead of 257).
+BODY_PB = ('Image {\nx: -13\ny: -15\nanchors.horizontalCenter: parent.horizontalCenter\n'
+           'source: "qrc:/img/EXPFX_Active_1_PedalBody.png"\n}\n')
+
+
+def port(stock_qml, model="mx5"):
+    pb = model == "pedalboard"
     m = minify(stock_qml)
     if _norm(m) != _norm(stock_qml):
         raise ArtError("minify changed the QML tokens")
@@ -73,16 +80,19 @@ def port(stock_qml):
               "property bool aw: sa.status === Image.Loading || "
               "sa.status === Image.Ready && sa.implicitHeight * 2 > sa.implicitWidth\n"
               "readonly property var outlineGlowParameters:")
-    m = _sub1(m, "Image {\nid: stompBody\n", ART + "Image {\nid: stompBody\n")
-    m = _sub1(m, BODY, PED + BODY.replace("source:", "visible: !aw\nsource:"))
-    m = _sub1(m, "Colorize {\tanchors.fill: stompBody\n", "Colorize {\tanchors.fill: stompBody\nvisible: !aw\n")
+    art = ART.replace("@WAHY@", "252" if pb else "257")
+    m = _sub1(m, "Image {\nid: stompBody\n", art + "Image {\nid: stompBody\n")
+    body = BODY_PB if pb else BODY
+    m = _sub1(m, body, PED + body.replace("source:", "visible: !aw\nsource:"))
+    colorize = "Colorize {\nanchors.fill: stompBody\n" if pb else "Colorize {\tanchors.fill: stompBody\n"
+    m = _sub1(m, colorize, colorize + "visible: !aw\n")
     m = _sub1(m, LED, LED + "visible: !aw\n")
     m = _sub1(m, "visible: !ampOrCab() && !signalChainModule.isIR\n",
               "visible: !aw && !ampOrCab() && !signalChainModule.isIR\n")
     m = _sub1(m, "visible: isAPedalConnected || isBPedalConnected",
               "visible: !aw && (isAPedalConnected || isBPedalConnected)")
-    m = _sub1(m, 'source: "../../img/stompswitch.png"',
-              'source: "../../img/stompswitch.png"; opacity: aw ? 0.01 : 1')
+    sw = 'source: "qrc:/img/stompswitch.png"' if pb else 'source: "../../img/stompswitch.png"'
+    m = _sub1(m, sw, sw + "; opacity: aw ? 0.01 : 1")
     return m
 
 

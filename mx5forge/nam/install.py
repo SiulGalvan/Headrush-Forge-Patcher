@@ -35,10 +35,11 @@ def hijack_evil(evil, instances, log=print, target=targets.MX5, amp=False):
     return f(slot), f(slot2), f(slot_amp)
 
 
-def install(fs, evil, slot_hex, slot_v2_hex, log=print, engine="nam-mod", slot_amp_hex=None, target=targets.MX5):
-    """Write the patched Evil, the two libraries and the launcher script into the rootfs."""
-    stock = fs.cat(SCRIPT).decode()
-    if "NAM_HOOK_SLOT" in stock or fs.exists("/usr/Evil/libnam_hook.so"):
+def install(fs, evil, slot_hex, slot_v2_hex, log=print, engine="nam-mod", slot_amp_hex=None, target=targets.MX5, stock_text=None):
+    """Write the patched Evil, the two libraries and the launcher script into the rootfs.
+    stock_text: the launcher script with an earlier nam-mod already taken out (see revert.py)."""
+    stock = stock_text if stock_text is not None else fs.cat(SCRIPT).decode()
+    if stock_text is None and ("NAM_HOOK_SLOT" in stock or fs.exists("/usr/Evil/libnam_hook.so")):
         raise launcher.LauncherError("this firmware already contains the NAM mod - start from the stock HeadRush 2.7 firmware")
     new_script = launcher.build(stock, slot_hex, slot_v2_hex, slot_amp_hex,
                                 "0x%x" % target["amp_orig_process_fn"] if slot_amp_hex else None)

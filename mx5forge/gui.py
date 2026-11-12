@@ -29,6 +29,7 @@ class App(tk.Tk):
         self.minsize(640, 640)
         self.q = queue.Queue()
         self.busy = False
+        self.model = tk.StringVar(value="mx5")
         self.instances = tk.IntVar(value=2)
         self.bridge = tk.BooleanVar(value=True)
         self.design = tk.BooleanVar(value=False)
@@ -48,6 +49,12 @@ class App(tk.Tk):
         ttk.Label(self, text="HeadRush MX5 - firmware 2.7", font=("TkDefaultFont", 13, "bold")).pack(anchor="w", **pad)
         ttk.Label(self, text="Builds a patched copy of the official updater on your own computer. Nothing from "
                              "HeadRush is shipped with this tool.", wraplength=600).pack(anchor="w", **pad)
+
+        f = ttk.LabelFrame(self, text="Device (only used when the official firmware is downloaded)")
+        f.pack(fill="x", **pad)
+        ttk.Radiobutton(f, text="HeadRush MX5", variable=self.model, value="mx5").pack(anchor="w", padx=8, pady=2)
+        ttk.Radiobutton(f, text="HeadRush Pedalboard (EXPERIMENTAL - never run on real hardware)",
+                        variable=self.model, value="pedalboard").pack(anchor="w", padx=8, pady=2)
 
         f = ttk.LabelFrame(self, text="NAM mod")
         f.pack(fill="x", **pad)
@@ -149,7 +156,7 @@ class App(tk.Tk):
         o = pipeline.Options(self.instances.get(), self.bridge.get(), self.design.get(), self.racks.get() or None,
                              self.src.get() or None if self.own_file.get() else None, self.out.get(),
                              self._say, self._progress, engine=self.engine.get(), amp=self.amp.get(),
-                                audio_midi=self.audio_midi.get())
+                                audio_midi=self.audio_midi.get(), model=self.model.get())
         if self.own_file.get() and not o.source:
             messagebox.showerror("MX5 Forge", "Choose the firmware file.")
             return

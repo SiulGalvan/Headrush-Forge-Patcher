@@ -21,3 +21,27 @@ MX5.update({
     "amp_orig_process_fn": 0x139538,
     "amp_process_slot": 7,
 })
+
+# HeadRush Pedalboard, firmware 2.7 (FIT compatible "inmusic,mg01").  Derived from a Pedalboard 2.7 image that already carried
+# the nam-mod 0.1.6 hijack (its libnam_hook.so / libnam_preload.so are byte-identical to the MX5 ones): the trampoline
+# holds the original process() (0x3260e0) and the hook slot, the hijacked vtable slot sits at 0x1839064 (= slot 8 of
+# 0x1839044), Anxiety OD V2 follows at +0x7C with the same process() in slot 8.  The AmpCab vtable comes from the RTTI
+# (same method that reproduces the MX5 value); its process() is instruction-for-instruction the MX5 one.
+# NOT yet run on a Pedalboard.
+PEDALBOARD = {
+    "name": "pedalboard",
+    "compatible": "inmusic,mg01",
+    "engine_vtable_vaddr": 0x1839044,
+    "orig_process_fn": 0x3260E0,
+    "v2_engine_vtable_vaddr": 0x18390C0,
+    "v2_orig_process_fn": 0x3260E0,
+    "amp_engine_vtable_vaddr": 0x1632E7C,
+    "amp_orig_process_fn": 0x15BF28,
+    "amp_process_slot": 7,
+}
+
+MODELS = {"mx5": MX5, "pedalboard": PEDALBOARD}
+
+
+def for_model(key):
+    return MODELS[key]
