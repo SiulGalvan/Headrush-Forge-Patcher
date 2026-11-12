@@ -76,14 +76,17 @@ def port(stock_qml, model="mx5"):
     m = minify(stock_qml)
     if _norm(m) != _norm(stock_qml):
         raise ArtError("minify changed the QML tokens")
+    # Pedalboard: its slot is a few bytes tighter, so the added text uses the numeric values of Image.Loading (2)
+    # and Image.Ready (1) - then plain zlib is enough, without the optional zopfli.
+    num = (lambda s: s.replace("Image.Loading", "2").replace("Image.Ready", "1")) if pb else (lambda s: s)
     m = _sub1(m, "readonly property var outlineGlowParameters:",
-              "property bool aw: sa.status === Image.Loading || "
-              "sa.status === Image.Ready && sa.implicitHeight * 2 > sa.implicitWidth\n"
+              num("property bool aw: sa.status === Image.Loading || "
+                  "sa.status === Image.Ready && sa.implicitHeight * 2 > sa.implicitWidth\n") +
               "readonly property var outlineGlowParameters:")
-    art = ART.replace("@WAHY@", "252" if pb else "257")
+    art = num(ART.replace("@WAHY@", "252" if pb else "257"))
     m = _sub1(m, "Image {\nid: stompBody\n", art + "Image {\nid: stompBody\n")
     body = BODY_PB if pb else BODY
-    m = _sub1(m, body, PED + body.replace("source:", "visible: !aw\nsource:"))
+    m = _sub1(m, body, num(PED) + body.replace("source:", "visible: !aw\nsource:"))
     colorize = "Colorize {\nanchors.fill: stompBody\n" if pb else "Colorize {\tanchors.fill: stompBody\n"
     m = _sub1(m, colorize, colorize + "visible: !aw\n")
     m = _sub1(m, LED, LED + "visible: !aw\n")
