@@ -51,7 +51,11 @@ Nada de HeadRush se incluye en el repositorio: la herramienta lee todo del actua
 
 Licencias y orígenes: [THIRD_PARTY.md](THIRD_PARTY.md). El proyecto es GPL-3.0 porque incluye código portado del nam-mod.
 
-> **Bridge y audio USB.** En el MX5 probado, la función USB-MIDI del Bridge dentro del dispositivo de audio USB ralentizaba el equipo al grabar a **48 kHz** (unas 110.000 interrupciones USB por segundo en lugar de unas 8.000), pero no a 44,1 kHz. Por eso `--audio-midi auto` (por defecto) añade esa función a todas las frecuencias salvo 48 y 96 kHz (96 kHz se trata como 48 kHz por petición, no se ha medido); `on` la añade siempre (Bridge original) y `off` nunca (versión «lite»). Sin la función, MX-Edit solo conecta mientras el audio USB está inactivo. Solo se han medido 44,1 y 48 kHz.
+> **Bridge y audio USB.** En el MX5 probado, el Bridge original añadía una función USB-MIDI al dispositivo de audio USB, y eso
+> ralentizaba el equipo al grabar por audio USB a **48 kHz** (unas 110.000 interrupciones USB por segundo en lugar de unas 8.000).
+> Por eso esta herramienta usa solo el comportamiento "lite": mientras el audio USB está activo **no** hay USB-MIDI (MX-Edit no
+> puede conectarse); el dispositivo MIDI independiente se retira al empezar el audio USB y el daemon del Bridge lo vuelve a crear
+> unos segundos después de que termine. Ya no hay opción para esto (antes `--audio-midi`, con variantes por frecuencia de muestreo).
 
 ## Ejecutable de Windows (.exe)
 

@@ -13,10 +13,6 @@ def main(argv=None):
                     help="NAM engine: nam-mod 0.1.6 (default, proven on MX5), the NAM Extended build, or extended-fair (Extended without the SCHED_IDLE/nice background priority, which slowed the MX5 in USB-audio 48 kHz mode)")
     ap.add_argument("--amp", action="store_true",
                     help="EXPERIMENTAL: also make the 82 LEAD 800 Bright amp a NAM amp (needs --engine extended)")
-    ap.add_argument("--audio-midi", choices=("auto", "on", "off"), default="auto",
-                    help="MX5 Bridge: USB-MIDI function inside the USB-audio gadget (MX-Edit while USB audio is active). "
-                         "auto (default) = on except at 48 and 96 kHz (the 48 kHz family slowed the device on one MX5); on = always (original Bridge); "
-                         "off = never ('lite')")
     ap.add_argument("--probe", action="store_true", help="DIAGNOSTIC: record load figures after USB audio starts (probe.txt on the USB drive)")
     ap.add_argument("--no-daemons", action="store_true",
                     help="DIAGNOSTIC: Bridge without its two background services (MX-Edit will not connect)")
@@ -36,7 +32,7 @@ def main(argv=None):
         from . import gui
         return gui.main()
     o = pipeline.Options(a.instances, not a.no_bridge, a.design, a.rack_art, a.input, a.out or ".", engine=a.engine, amp=a.amp,
-                         audio_midi=a.audio_midi, daemons=not a.no_daemons, probe=a.probe, model=a.model)
+                         daemons=not a.no_daemons, probe=a.probe, model=a.model)
     print("mx5forge %s - unofficial, use at your own risk\n" % __version__)
     try:
         out, missing = pipeline.build(o)

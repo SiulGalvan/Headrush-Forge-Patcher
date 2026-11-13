@@ -28,8 +28,10 @@ expected layout and the gap is zero (so it never patches twice or the wrong bina
   Nothing is written unless all of them match.
 
 ## MX5 Bridge (`vendor/mxedit`)
-Unmodified MX-Edit 0.9.5 code (`bridgepatch.py`): USB MIDI function, `mx5bridge-*.sh`, an ARM `sqlite3`, and the
-MIDI assignment QML files. It reads the NAM launcher line, so it runs after the NAM step.
+MX-Edit 0.9.5 code (`bridgepatch.py`, one regex line and the "lite" USB change documented in THIRD_PARTY.md): `mx5bridge-*.sh`,
+an ARM `sqlite3`, and the MIDI assignment QML files. It reads the NAM launcher line, so it runs after the NAM step.
+USB-MIDI exists only while USB audio is off: `evil-begin audio` tears the stand-alone MIDI gadget down, the daemon builds it
+again (after about 6 s idle) once USB audio has ended.
 
 ## NAM amp (experimental, `--amp`)
 `AmpCab` is the DSP class behind every amplifier block. Its vtable was located through the RTTI of the MX5 2.7 Evil

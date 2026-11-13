@@ -22,7 +22,7 @@ class Options(unittest.TestCase):
         pipeline.check_options(pipeline.Options(instances=2))
 
     def test_folder_names(self):
-        self.assertEqual(pipeline.folder_name(pipeline.Options(2, True, False)), "HeadRush_MX5_2.7_NAM2_BridgeAuto_Updater")
+        self.assertEqual(pipeline.folder_name(pipeline.Options(2, True, False)), "HeadRush_MX5_2.7_NAM2_Bridge_Updater")
         self.assertEqual(pipeline.folder_name(pipeline.Options(4, False, True)), "HeadRush_MX5_2.7_NAM4_Design_Updater")
 
 
