@@ -13,6 +13,7 @@ import fitpatch
 import patcher
 import xzblocks
 
+from .art import amp as amp_art
 from .art import apply as art_apply
 from .art import qmlport
 from .nam import install as nam_install
@@ -140,6 +141,8 @@ def build(o):
             slot, slot2, slot_amp = nam_install.hijack_evil(evil, o.instances, log, target=target, amp=o.amp)
             if o.design:
                 art_apply.apply(evil, o.rack_dir, nam_v2_badge=(o.instances == 4), log=log, model=o.model)
+            if o.amp:
+                amp_art.apply(evil, o.model, log=log)
             nam_install.install(fs, evil, slot, slot2, log, engine=o.engine, slot_amp_hex=slot_amp, target=target, stock_text=script)
             written[nam_install.EVIL] = bytes(evil)
 

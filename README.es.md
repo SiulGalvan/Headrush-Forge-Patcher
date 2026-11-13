@@ -57,6 +57,9 @@ Licencias y orígenes: [THIRD_PARTY.md](THIRD_PARTY.md). El proyecto es GPL-3.0 
 > puede conectarse); el dispositivo MIDI independiente se retira al empezar el audio USB y el daemon del Bridge lo vuelve a crear
 > unos segundos después de que termine. Ya no hay opción para esto (antes `--audio-midi`, con variantes por frecuencia de muestreo).
 
+## Imagen del amplificador NAM
+Con `--amp` el bloque "82 LEAD 800 Bright" también recibe su propia imagen (`mx5forge/art/assets/nam_amp.png`, 290x119 px, aportada por el autor del proyecto). Se sustituyen en su sitio los dos PNG de ese amplificador (el normal y la variante `...2.png` del bloque doble), tanto en el firmware del MX5 como en el del Pedalboard; el "2" se recorta de la propia imagen del firmware al compilar. No hace falta cambiar el QML.
+
 ## Ejecutable de Windows (.exe)
 
 - **Sin instalar nada:** en GitHub, pestaña *Actions* → workflow *build* → *Run workflow*. Al terminar, descarga el artefacto `mx5forge-windows-latest` (contiene `mx5forge.exe`).

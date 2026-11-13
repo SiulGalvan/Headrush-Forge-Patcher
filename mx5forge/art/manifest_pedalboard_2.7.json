@@ -739,5 +739,21 @@
   "stock_sha1": "97affa85e8604281c87dfdd46ad4b80e7561ee53",
   "register_off": 49994912,
   "register_byte_off": 64
+ },
+ "amp": {
+  "82 LEAD 800 Bright.png": {
+   "pos": 40080727,
+   "slot": 60104,
+   "w": 290,
+   "h": 119,
+   "sha1": "59d341c963ff46631a2331939d5db571dc8cb796"
+  },
+  "82 LEAD 800 Bright2.png": {
+   "pos": 39025317,
+   "slot": 61391,
+   "w": 290,
+   "h": 119,
+   "sha1": "98d5033850892d5d7f91a6b968230ee177eba71e"
+  }
  }
 }
