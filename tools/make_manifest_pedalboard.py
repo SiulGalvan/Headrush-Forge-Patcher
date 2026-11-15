@@ -39,11 +39,13 @@ for m in re.finditer(rb"\x78[\x01\x5e\x9c\xda]", pb):
     if not (500 < U < 200000 and 100 < L <= U):
         continue
     try:
-        o = zlib.decompressobj().decompress(pb[p:p + L], U + 10)
+        d = zlib.decompressobj()
+        o = d.decompress(pb[p:p + L], U + 10)
     except zlib.error:
         continue
     if len(o) == U and b"id: activeStomp" in o:
-        found.append((p, L, U, hashlib.sha1(o).hexdigest()))
+        # L is the blob length, which counts the 4-byte uncompressed-size field: the zlib stream itself is 4 shorter
+        found.append((p, L - 4, U, hashlib.sha1(o).hexdigest()))
 if len(found) != 1:
     sys.exit("ActiveStomp.qml: %d candidates" % len(found))
 p, L, U, sha = found[0]

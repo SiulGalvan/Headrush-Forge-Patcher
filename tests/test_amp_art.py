@@ -17,10 +17,16 @@ class Badge(unittest.TestCase):
         icon = Image.new("RGBA", (290, 119), (0, 0, 0, 0))
         for x in range(65, 225):
             for y in range(13, 103):
-                icon.putpixel((x, y), (0, 200, 180, 255))
+                icon.putpixel((x, y), (20, 60, 70, 255))
         out = amp.with_badge(icon, digit)
         self.assertEqual(out.getpixel((200, 30)), (255, 255, 255, 255))     # inside the icon, top right
         self.assertEqual(out.getpixel((10, 10))[3], 0)                      # transparent margin untouched
+
+    def test_digit_is_dark_on_a_light_picture(self):
+        digit = Image.new("RGBA", (12, 20), (255, 255, 255, 255))
+        icon = Image.new("RGBA", (290, 119), (190, 190, 190, 255))
+        out = amp.with_badge(icon, digit)
+        self.assertEqual(out.getpixel((270, 20)), (24, 24, 24, 255))
 
 
 if __name__ == "__main__":

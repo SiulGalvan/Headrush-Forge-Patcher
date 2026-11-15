@@ -1,0 +1,19 @@
+name: block-manager-exe
+# Builds HeadRush_NAM_Block_Manager.exe (single file, no Python needed on the target PC).
+# Run it from the Actions tab ("Run workflow") or by pushing a change to tools/; the .exe is the workflow's artifact.
+on:
+  workflow_dispatch:
+  push:
+    paths: ["tools/headrush_block_manager_gui.py", "tools/nam_minify.py", ".github/workflows/block-manager.yml"]
+jobs:
+  exe:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: python -m unittest tests.test_nam_minify -v
+      - run: pip install pyinstaller
+      - run: pyinstaller --noconfirm --onefile --windowed --name HeadRush_NAM_Block_Manager tools/headrush_block_manager_gui.py
+      - uses: actions/upload-artifact@v4
+        with: { name: HeadRush_NAM_Block_Manager, path: dist/HeadRush_NAM_Block_Manager.exe }

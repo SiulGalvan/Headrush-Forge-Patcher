@@ -96,12 +96,20 @@ def port(stock_qml, model="mx5"):
               "visible: !aw && (isAPedalConnected || isBPedalConnected)")
     sw = 'source: "qrc:/img/stompswitch.png"' if pb else 'source: "../../img/stompswitch.png"'
     m = _sub1(m, sw, sw + "; opacity: aw ? 0.01 : 1")
+    if pb:      # the Pedalboard slot is only 2735 bytes: this id name happens to compress best
+        if re.search(r"\bac\b", stock_qml):
+            raise ArtError("stock ActiveStomp.qml already uses the name 'ac'")
+        m = re.sub(r"\bsa\b", "ac", m)
     return m
 
 
 def _deflate(b):
-    c = zlib.compressobj(9, zlib.DEFLATED, 15, 9)
-    out = c.compress(b) + c.flush()
+    out = None
+    for mem in (9, 8, 5):
+        c = zlib.compressobj(9, zlib.DEFLATED, 15, mem)
+        o = c.compress(b) + c.flush()
+        if out is None or len(o) < len(out):
+            out = o
     try:                                  # optional: zopfli squeezes a few dozen bytes more
         import zopfli.zlib as z
         alt = z.compress(b, numiterations=15)
@@ -122,6 +130,10 @@ def fit(qml, size):
                        "(try: pip install zopfli)" % (len(base), size))
     if len(base) == size:
         return base, q
+    for tail in (b"\n", b"\n\n", b"\n\n\n", b" ", b"  ", b"//\n", b"\n\n\n\n", b"\n\n\n\n\n\n"):   # cheap padding first
+        c = _deflate(q + tail)
+        if len(c) == size:
+            return c, q + tail
     for seed in range(300):
         rnd = random.Random(seed)
         pad = "".join(rnd.choice(string.ascii_letters + string.digits) for _ in range(120))

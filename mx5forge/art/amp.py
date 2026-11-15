@@ -9,7 +9,7 @@ import io
 import os
 import struct
 
-from PIL import Image, ImageChops
+from PIL import Image, ImageChops, ImageStat
 
 from . import apply as _apply
 
@@ -36,7 +36,14 @@ def digit_from_stock(plain, second):
 def with_badge(icon, digit):
     out = icon.copy()
     box = icon.getchannel("A").point(lambda v: 255 if v > 8 else 0).getbbox() or (0, 0) + icon.size
-    out.alpha_composite(digit, (box[2] - digit.width - 14, box[1] + 12))
+    pos = (box[2] - digit.width - 14, box[1] + 12)
+    # the stock digit is white (for a dark amp picture); on a light picture (silver plate) it would vanish, so draw it dark
+    under = icon.convert("L").crop(pos + (pos[0] + digit.width, pos[1] + digit.height))
+    if ImageStat.Stat(under).mean[0] > 100:
+        dark = Image.new("RGBA", digit.size, (24, 24, 24, 255))
+        dark.putalpha(digit.getchannel("A"))
+        digit = dark
+    out.alpha_composite(digit, pos)
     return out
 
 

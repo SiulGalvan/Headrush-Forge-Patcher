@@ -275,10 +275,22 @@ float trim_gain(float raw01)
 // pre-both-attempts) avoids both failure modes -- the "never re-scan on
 // every switch" benefit (see g_preload_started below) doesn't need eager
 // triggering to work, only lazy-but-cached.
+// Lazy-loaded entry (option 3 "current model first, rest in background").
+// Preload now only LISTS the files (cheap directory walk + sort) and publishes
+// g_models_ready; the JSON parse + test-construct validity check that used to
+// run for EVERY file before anything could play now runs per file on demand
+// (ensure_loaded), so the model the knob is on is usable after reading ONE
+// file. fill_remaining_models_in_background() then loads the rest at idle
+// priority. Entries are heap-allocated (std::atomic isn't movable) and the
+// vector is built once, before g_models_ready is published, never resized.
+//   state: 0 = not loaded yet, 1 = ready (config valid), 2 = bad file.
+// A bad file is a dead slot (silence) -- indices no longer shift down past it.
 struct CachedModel
 {
   std::string display_name; // filename only, for sorting
-  nlohmann::json config;
+  std::filesystem::path path;
+  std::atomic<int> state{0};
+  nlohmann::json config; // written once under g_model_load_mutex, then published via state
 };
 
 // Calibration result cache, indexed the same way as g_cached_models (one
@@ -322,9 +334,64 @@ std::mutex g_calibration_cache_mutex;
 // thread holding g_calibration_cache_mutex.
 std::atomic<int> g_topology_epoch{0};
 
-std::vector<CachedModel> g_cached_models;
+std::vector<std::unique_ptr<CachedModel>> g_cached_models;
+std::mutex g_model_load_mutex; // serializes file loads (one at a time = bounded RAM/CPU spikes)
+std::atomic<bool> g_fill_started{false};
 std::atomic<bool> g_models_ready{false};
 std::atomic<bool> g_preload_started{false};
+
+// Loads+validates one file on demand. Returns true if usable. Safe from any
+// background thread (never call from the audio thread).
+bool ensure_loaded(size_t idx)
+{
+  if (idx >= g_cached_models.size())
+    return false;
+  CachedModel& m = *g_cached_models[idx];
+  int st = m.state.load(std::memory_order_acquire);
+  if (st != 0)
+    return st == 1;
+  std::lock_guard<std::mutex> lock(g_model_load_mutex);
+  st = m.state.load(std::memory_order_acquire);
+  if (st != 0)
+    return st == 1;
+  try
+  {
+    std::ifstream in(m.path);
+    nlohmann::json j;
+    in >> j;
+    // Full test-construct, not only JSON parse -- see the older comment: a
+    // syntactically valid file can still throw in nam::get_dsp and caused
+    // device reboots when a switch landed on it.
+    { auto discard = nam::get_dsp(j); }
+    m.config = std::move(j);
+    m.state.store(1, std::memory_order_release);
+    return true;
+  }
+  catch (...)
+  {
+    m.state.store(2, std::memory_order_release);
+    return false;
+  }
+}
+
+// Loads every not-yet-loaded model at idle priority, once per boot, started
+// only AFTER the knob's current model has been built (see
+// switch_model_in_background) so it never competes with it.
+void fill_remaining_models_in_background()
+{
+  bool expected = false;
+  if (!g_fill_started.compare_exchange_strong(expected, true))
+    return;
+  spawn_detached([]() {
+    flush_denormals_to_zero();
+    lower_background_thread_priority();
+    for (size_t i = 0; i < g_cached_models.size(); ++i)
+    {
+      ensure_loaded(i);
+      usleep(20000); // breathe between files; keep audio/UI first
+    }
+  });
+}
 
 void preload_models_in_background()
 {
@@ -335,7 +402,7 @@ void preload_models_in_background()
   spawn_detached([]() {
     flush_denormals_to_zero(); // brand-new thread -- see its own comment
     lower_background_thread_priority(); // ditto -- see its own comment
-    std::vector<CachedModel> found;
+    std::vector<std::unique_ptr<CachedModel>> found;
     std::error_code ec;
     const std::vector<std::filesystem::path> search_dirs = {
       model_dir(),
@@ -374,7 +441,7 @@ void preload_models_in_background()
         bool already = false;
         for (const auto& existing : found)
         {
-          if (existing.display_name == filename)
+          if (existing->display_name == filename)
           {
             already = true;
             break;
@@ -382,40 +449,23 @@ void preload_models_in_background()
         }
         if (already)
           continue;
-        try
-        {
-          std::ifstream in(entry.path());
-          nlohmann::json j;
-          in >> j;
-          // Fully test-construct the model here, not just parse its JSON --
-          // a file can have perfectly valid JSON syntax but a corrupt/
-          // malformed weight architecture that only throws once nam::get_dsp
-          // actually tries to build the DSP graph from it. Confirmed on real
-          // hardware: one such file caused occasional full-device reboots
-          // when a switch happened to land on it, even though preload's
-          // JSON-parse-only check let it through. Discarded immediately --
-          // this is purely a validity check, the real DSP gets built fresh
-          // per channel at actual switch time (see switch_model_in_background).
-          // A file that fails this never enters g_cached_models at all, so
-          // with N *.nam files and one corrupt, the pedal behaves as if there
-          // are only N-1 -- exactly like the corrupt file was never there.
-          { auto discard = nam::get_dsp(j); }
-          found.push_back(CachedModel{filename, std::move(j)});
-        }
-        catch (...)
-        {
-          // Bad/corrupt file -- skip it, don't let one bad file block every
-          // other model from loading.
-        }
+        // Validity (JSON parse + test-construct) is deferred to ensure_loaded().
+        auto m = std::make_unique<CachedModel>();
+        m->display_name = filename;
+        m->path = entry.path();
+        found.push_back(std::move(m));
       }
       if (!found.empty())
         break; // Stop at first directory that has models
     }
 
     std::sort(found.begin(), found.end(),
-              [](const CachedModel& a, const CachedModel& b) { return a.display_name < b.display_name; });
+              [](const std::unique_ptr<CachedModel>& a, const std::unique_ptr<CachedModel>& b) {
+                return a->display_name < b->display_name;
+              });
 
     g_calibration_cache.assign(found.size(), CalibrationEntry{});
+    // NOTE: must be fully built before g_models_ready is published below.
     g_cached_models = std::move(found);
     if (!g_cached_models.empty())
       g_models_ready.store(true, std::memory_order_release);
@@ -925,7 +975,17 @@ void switch_model_in_background(ModelState& s, float raw, bool force_reload_same
         s.pending_ready.store(true, std::memory_order_release);
         return;
       }
-      const nlohmann::json& config = g_cached_models[static_cast<size_t>(idx)].config;
+      if (!ensure_loaded(static_cast<size_t>(idx)))
+      {
+        // Corrupt/unusable file: behave as a silent step (dead slot).
+        for (int i = 0; i < kMaxChannels; ++i)
+          s.pending_dsp[i].reset();
+        s.pending_index = -1;
+        s.pending_ready.store(true, std::memory_order_release);
+        return;
+      }
+      fill_remaining_models_in_background(); // after the current model is validated
+      const nlohmann::json& config = g_cached_models[static_cast<size_t>(idx)]->config;
 
       std::unique_ptr<nam::DSP> loaded[kMaxChannels];
       double chosen_ratio = 1.0;

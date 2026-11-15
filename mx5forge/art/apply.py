@@ -26,7 +26,10 @@ def apply(evil, rack_dir=None, nam_v2_badge=True, log=print, model="mx5"):
     qp = q["blob_off"]
     if struct.unpack(">I", orig[qp - 8:qp - 4])[0] != q["blob_len_prefix"]:
         raise qmlport.ArtError("ActiveStomp.qml blob not found - this is not the MX5 2.7 firmware")
-    stock = zlib.decompress(orig[qp:qp + q["stock_clen"]])
+    d = zlib.decompressobj()
+    stock = d.decompress(orig[qp:qp + q["stock_clen"] + 64])
+    if q["stock_clen"] + 64 - len(d.unused_data) != q["stock_clen"] or q["blob_len_prefix"] != q["stock_clen"] + 4:
+        raise qmlport.ArtError("ActiveStomp.qml slot size does not match the manifest")
     if hashlib.sha1(stock).hexdigest() != q["stock_sha1"]:
         raise qmlport.ArtError("ActiveStomp.qml differs from the MX5 2.7 original")
     needle = "/Groups/SignalChainModuleStomps/ActiveStomp.qml".encode("utf-16-le")
