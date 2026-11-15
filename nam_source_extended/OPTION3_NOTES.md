@@ -12,6 +12,3 @@ comprobada la sintaxis en x86 con `g++ -fsyntax-only`):
 - Archivo corrupto = ranura muerta (silencio); los índices ya NO se desplazan.
 - Las llamadas del hilo de audio solo usan `g_cached_models.size()` (el vector
   se construye una vez antes de publicar `g_models_ready`).
-
-Hay que recompilar los blobs con tu cadena (Bootlin). Si el arranque falla,
-vuelve a la versión anterior (`nam_hook.cpp.orig` / blob previo).
