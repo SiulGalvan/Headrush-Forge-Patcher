@@ -75,7 +75,7 @@ class App(tk.Tk):
         f = ttk.LabelFrame(body, text="Device (only used when the official firmware is downloaded)")
         f.pack(fill="x", **pad)
         ttk.Radiobutton(f, text="HeadRush MX5", variable=self.model, value="mx5").pack(anchor="w", padx=8, pady=2)
-        ttk.Radiobutton(f, text="HeadRush Pedalboard (EXPERIMENTAL - never run on real hardware)",
+        ttk.Radiobutton(f, text="HeadRush Pedalboard",
                         variable=self.model, value="pedalboard").pack(anchor="w", padx=8, pady=2)
 
         f = ttk.LabelFrame(body, text="NAM mod")
@@ -87,9 +87,9 @@ class App(tk.Tk):
 
         f = ttk.LabelFrame(body, text="NAM engine")
         f.pack(fill="x", **pad)
-        ttk.Radiobutton(f, text="nam-mod 0.1.6 (proven on the MX5)", variable=self.engine, value="nam-mod",
+        ttk.Radiobutton(f, text="nam-mod 0.1.6 (Original NAM Mod)", variable=self.engine, value="nam-mod",
                         command=self._sync).pack(anchor="w", padx=8, pady=2)
-        ttk.Radiobutton(f, text="NAM Extended (gentler background loading; not yet tested on an MX5)", variable=self.engine,
+        ttk.Radiobutton(f, text="NAM Extended (gentler background loading; tested on an MX5)", variable=self.engine,
                         value="extended", command=self._sync).pack(anchor="w", padx=8, pady=2)
         ttk.Radiobutton(f, text="NAM Extended (fair): Extended without the idle-priority background threads (experimental)", variable=self.engine,
                         value="extended-fair", command=self._sync).pack(anchor="w", padx=8, pady=2)
