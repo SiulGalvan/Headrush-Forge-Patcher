@@ -9,8 +9,8 @@ on:
         default: true
 env:
   # Toolchain Bootlin armv7-eabihf (prefijo arm-buildroot-linux-gnueabihf-). Debe ser compatible con
-  # la glibc del firmware; cambia la URL si tu cadena habitual usa otra version.
-  BOOTLIN_URL: https://toolchains.bootlin.com/downloads/releases/toolchains/armv7-eabihf/tarballs/armv7-eabihf--glibc--stable-2022.08-1.tar.bz2
+  # la glibc del firmware (2.32 en el rootfs del MX5: la toolchain 2022.08 usa glibc 2.34 y el blob NO carga); cambia la URL si tu cadena habitual usa otra version.
+  BOOTLIN_URL: https://toolchains.bootlin.com/downloads/releases/toolchains/armv7-eabihf/tarballs/armv7-eabihf--glibc--stable-2020.08-1.tar.bz2
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -44,6 +44,10 @@ jobs:
           arm-buildroot-linux-gnueabihf-g++ --version
           bash scripts/build_blobs_native.sh
           file blobs/libnam_hook.so
+          # el firmware lleva glibc 2.32: ningun simbolo puede pedir una version mayor
+          if readelf --dyn-syms -W blobs/libnam_hook.so | grep -E 'GLIBC_2\.(3[3-9]|[4-9][0-9])'; then
+            echo "ERROR: el blob requiere glibc > 2.32 (toolchain demasiado nueva)"; exit 1
+          fi
       - uses: actions/upload-artifact@v4
         with:
           name: blobs-extended
