@@ -60,23 +60,6 @@ Licencias y orígenes: [THIRD_PARTY.md](THIRD_PARTY.md). El proyecto es GPL-3.0 
 ## Imagen del amplificador NAM
 Con `--amp` el bloque "82 LEAD 800 Bright" también recibe su propia imagen (`mx5forge/art/assets/nam_amp.png`, 290x119 px, aportada por el autor del proyecto). Se sustituyen en su sitio los dos PNG de ese amplificador (el normal y la variante `...2.png` del bloque doble), tanto en el firmware del MX5 como en el del Pedalboard; el "2" se recorta de la propia imagen del firmware al compilar. No hace falta cambiar el QML.
 
-## Modelos .nam más ligeros (opcional)
-
-`tools/nam_minify.py` se ejecuta en el PC y reescribe cada `.nam` con el texto decimal más corto que da exactamente el mismo
-valor float32 (el que el pedal ya usa al cargarlo) y sin espacios. El archivo pesa bastante menos y se interpreta más
-rápido; el sonido es idéntico bit a bit. No toca los originales (escribe en una carpeta `minified`):
-
-    python tools/nam_minify.py mis_modelos/
-
-## HeadRush NAM Block Manager (herramienta de Windows)
-
-`tools/headrush_block_manager_gui.py` (compilable con `tools\build_block_manager.bat`) escanea la carpeta `NAM` de la
-unidad USB del pedal y crea un preset de bloque por modelo, con su nombre real. Versión 2.1: antes de sincronizar puede
-**optimizar los `.nam`** con `nam_minify` (misma salida de sonido, archivos más pequeños; los originales se guardan en
-`NAM_originales\`, junto a `NAM`, y el pedal no los escanea). También hay un botón "Solo optimizar .nam".
-
-Sin Python: sube el repositorio a GitHub y ejecuta el workflow **block-manager-exe** (pestaña Actions → Run workflow); el `.exe` queda como artefacto de la ejecución.
-
 ## Ejecutable de Windows (.exe)
 
 - **Sin instalar nada:** en GitHub, pestaña *Actions* → workflow *build* → *Run workflow*. Al terminar, descarga el artefacto `mx5forge-windows-latest` (contiene `mx5forge.exe`).

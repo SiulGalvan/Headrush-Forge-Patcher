@@ -10,7 +10,6 @@ comprobada la sintaxis en x86 con `g++ -fsyntax-only`):
   lanza una sola vez `fill_remaining_models_in_background()` (prioridad idle,
   20 ms entre archivos) que carga el resto.
 - Archivo corrupto = ranura muerta (silencio); los índices ya NO se desplazan.
-  Esto coincide con el mapeo archivo<->% del Block Manager.
 - Las llamadas del hilo de audio solo usan `g_cached_models.size()` (el vector
   se construye una vez antes de publicar `g_models_ready`).
 
