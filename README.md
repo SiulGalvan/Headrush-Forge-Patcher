@@ -17,7 +17,7 @@ Para instalar el mod en tu pedalera, existen 2 vias de sin necesidad de compilar
 | Archivo | Descripción | Descarga Directa |
 | :--- | :--- | :--- |
 | **Firmware Updater (NAM A2 + BRIDGE + ARTMOD)** | Flasheador automático para HeadRush MX5 ya parchado con soporte Dual NAM + MX-EDIT + ARTMOD | [Descargar .exe]
-| **Forge Patcher** | Constructor de update.img para parchar modularmente la instalación y elegir que componentes integrar | [Descargar .exe] |
+| **Forge Patcher** | Constructor de update.img para parchar modularmente la instalación y elegir que componentes integrar | [Descargar Parcheador](https://github.com/SiulGalvan/Headrush-Forge-Patcher/releases/download/v1.0/MX_FORGE_PATCHER_V1.exe) |
 
 > **Release Actual**: [v1.0]
 
