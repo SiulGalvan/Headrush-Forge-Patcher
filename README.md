@@ -1,4 +1,4 @@
-# HeadRush MX5 — Forge Patch Mod
+# HeadRush — Forge Patch Mod
 _Antiguamente MX5 Compatibility Layer_
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
@@ -16,7 +16,7 @@ Para instalar el mod en tu pedalera, existen 2 vias de sin necesidad de compilar
 
 | Archivo | Descripción | Descarga Directa |
 | :--- | :--- | :--- |
-| **Firmware Updater (NAM A2 + BRIDGE + ARTMOD)** | Flasheador automático para HeadRush MX5 ya parchado con soporte Dual NAM + MX-EDIT + ARTMOD | [Descargar .RAR]
+| **Firmware Updater (NAM A2 + BRIDGE + ARTMOD)** | Flasheador automático para HeadRush MX5 ya parchado con soporte Dual NAM + MX-EDIT + ARTMOD | [Descargar .exe]
 | **Forge Patcher** | Constructor de update.img para parchar modularmente la instalación y elegir que componentes integrar | [Descargar .exe] |
 
 > **Release Actual**: [v1.0]
@@ -31,8 +31,10 @@ Para instalar el mod en tu pedalera, existen 2 vias de sin necesidad de compilar
   - **Pedal Anxiety OD (NAM)** (y Anxiety OD V2): Inferencia transparente como pedal de saturación/overdrive con controles de Input Trim, Level y selector de modelo.
 - **Gráficos Integrados en Pantalla Táctil**:
   - Gráficos integrados en los recursos QML/RCC de HeadRush con soporte de NAM PEDAL y arte de la 2da generación para los pedales tipo Rack
-- **MXBRIDGE**:
-  - Herramienta que permite enviar y recibir señales MIDI desde un ordenador hacia la pedalera y viceversa, pilar para el funcionamiento de MXEDIT y posibles integraciones como medidor DSP.
+- **MXBRIDGE-lite(NUEVO EN V1)**:
+  - Herramienta que permite enviar y recibir señales MIDI desde un ordenador hacia la pedalera y viceversa, pilar para el funcionamiento de MXEDIT, a su vez para evitar sobrecargar del USB, desactiva MIDI USB al activar USB-AUDIO y lo reactiva al desactivar USB-AUDIO. Esto soluciona problemas de ralentización del equipo al usarlo como placa de audio
+-  **NAM EXTENDED V2(NUEVO EN V1)**: Modificación de los hilos del modulo NAM y su lógica de lectura para mejorar la carga de los archivos y reducir los artefactos. A su vez, realiza una carga diferida para reducir considerablemente el silencio al cambiar entre NAM en un mismo rig.
+- **NAM EXTENDED AMP (NUEVO EN V1)**: Secuestro del modelo LEAD 800 BRIGHT para integrar controles de EQ y X2AMP con el uso de NAM, no utilizar junto a NAM de 4 instancias, ya que cargar 6 modulos NAM va a sobrecargar el sistema y puede forzar a tener que realizar un reseteo de Fabrica para salir del bucle de crasheo en arranque.
 
 ---
 
@@ -47,34 +49,39 @@ Para instalar el mod en tu pedalera, existen 2 vias de sin necesidad de compilar
 | **Level** | 0% – 100% | **Output Trim**: 50% = Salida Unitaria (0.0 dB). 0% = Mute, 100% = +12 dB. |
 | **On/Off**| Bypass | Paso en seco directo (*dry passthrough*). |
 
+### Bloque Amplificador: 82 LEAD 800 (NAM)
+
+| Página | Control | Rango | Función Técnica |
+| :--- | :--- | :--- | :--- |
+| **Pág 1** | **Gain** | 0% – 100% | Ganancia de entrada previa a la red neuronal (50% = 0 dB). |
+| **Pág 1** | **Presence** | 0% – 100% | Filtro High-Shelf activo en 6 kHz ($\pm 10\text{ dB}$, 50% = plano). |
+| **Pág 1** | **Master** | 0% – 100% | Nivel de salida general post-inferencia y EQ (50% = 0 dB). |
+| **Pág 2** | **Bass** | 0% – 100% | Filtro Low-Shelf centrado en 100 Hz ($\pm 12\text{ dB}$, 50% = plano). |
+| **Pág 2** | **Mid** | 0% – 100% | Filtro Peaking en 750 Hz, $Q=1.0$ ($\pm 12\text{ dB}$, 50% = plano). |
+| **Pág 2** | **Treble** | 0% – 100% | Filtro High-Shelf en 3.5 kHz ($\pm 12\text{ dB}$, 50% = plano). |
+| **Pág 3** | **Depth** | 0% – 100% | **Selector de Modelo NAM**: Mapeo 1:1 exacto alfabético de perfiles USB. |
+| **Pág 3** | **Bright** | OFF / ON | **Filtro Tight HPF (150 Hz)**: Elimina graves fangosos antes de la distorsión. |
+
 ---
 
 ## Via de instalacion
 **Instalación Rápida**
-1. Conecta tu HeadRush MX5 mediante USB a la PC mediante.
+1. Conecta tu HeadRush MX5 o Pedalboard mediante USB a la PC mediante.
 2. En la pedalera, entra en **Global Settings -> Firmware Update**.
 3. Ejecuta `Firmware Updater (NAM A2 + BRIDGE + ARTMOD).exe` tras descargarlo de la carpeta /release o descargarlo directamente desde Releases.
 4. Sigue los pasos en pantalla hasta que la pedalera complete el flasheo y reinicie.
 
 **Instalación Personalizada**
 
-1. Descarga `Headrush MX5 Forge Patcher 0.2.0.exe` o compilalo con `build_windows.bat` (Requieres de Phyton para ello)
-2. Seleccionas que partes de los modulos necesitas, si integras el mod de arte, es necesario descargar el archivo `Rack_pedal.rar`, descomprimirlo en una carpeta y seleccionar la misma dentro del parcheador en la opción "Your rack module art". Caso contrario, los pedales tipo rack como DYNIII Compressor saldran con las graficas originales (cuadros de colores)
-3. Elegir en que directorio se creara la carpeta del nuevo firmware
-4. Presionar `Build Updater`
-5. Realizar lo mismo que la instalación rapida
+1. Descarga `Headrush Forge Patcher v1.exe` o compilalo con `build_windows.bat` (Requieres de Phyton para ello)
+2. Seleccionas que partes de los modulos necesitas, si integras el mod de arte, deberas conseguir por tus propios medios las imagenes de los modulos rack ya que no forman parte de update.img, por lo que deberas seleccionar una carpeta con estas imagenes dentro del parcheador en la opción "Your rack module art". Caso contrario, los pedales tipo rack como DYNIII Compressor saldran con las graficas originales (cuadros de colores)
+4. Elegir en que directorio se creara la carpeta del nuevo firmware
+5. Presionar `Build Updater`
+6. Realizar lo mismo que la instalación rapida
 
 ---
-## Funciones experimentales (Usar bajo precaución)
-_Estas funciones todavía se encuentran en fase de prueba y solo son accesibles mediante `Forge Patcher`, su uso de momento es estrictamente de testeo para integrarlos en actualizaciones futuras y no representan el resultado final de la integración_
-
-- **NAM EXTENDED**: Modificación de los hilos del modulo NAM y la logica de lectura para mejorar la carga de los archivos y reducir los artefeactos
-  - **Variante (Fair)**: No integra mejoras en los hilos pero si reduce la probabilidad de artefactos al cambiar de NAM al mejorar la logica de lectura.
-- **MXBRIDGE-LIGHT - Integrado en 0.9.3**: Modificación de MXBRIDGE que para el MIDI USB al activar USB-AUDIO a una resolución de 48kHz o 96kHz para evitar perdida de rendimiento y relentización general del sistema
-  - **Variante (Always)**: No integra esta desactivación
-  - **Variante (Only)**: Desactiva el USB-MIDI al activar USB AUDIO sin importar la resolución de muestreo
-- **NAM EXTENDED AMP - MUY EXPERIMENTAL/WIP**: Secuestro del modelo LEAD 800 BRIGHT para integrar controles de EQ y X2AMP con el uso de NAM, no utilizar junto a NAM de 4 instancias, ya que cargar 6 modulos NAM va a sobrecargar el sistema y puede forzar a tener que realizar un reseteo de Fabrica para salir del bucle de crasheo en arranque.
-
+## Funciones experimentales (Completado)
+_Todas las funciones experimentales han sido testeadas y se confirmo su correcto funcionamiento en los dispostivitos tanto MX5 como Pedalboard. Por lo tanto, forman parte de la v1. Proximamente se añadira una nueva lista de funciones experimentales para añadir nuevas caractetisticas_
 ---
 
 ## Recuperación y Seguridad
