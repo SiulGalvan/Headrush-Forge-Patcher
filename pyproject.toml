@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "headrush-Forge-Patcher"
-version = "1.0"
+version = "1.0.3"
 description = "Build a forge patched HeadRush MX5 2.7 firmware updater: NAM mod, MX5 Bridge, pedal design"
 readme = "README.md"
 license = { text = "GPL-3.0-only" }
