@@ -1940,7 +1940,12 @@ extern "C" void nam_process_amp(void* this_, uint32_t param2, float** input, uin
   // Bypass (0x95a5 != 0) or model not yet ready: dry passthrough.
   // Checked AFTER the background model-switch state machine above so models
   // continue preloading even while the block is bypassed.
-  if (bypass_byte != 0 || !ready || !s.dsp[0])
+  // NOTE: an empty slot (active_index < 0, "silence") legitimately has no dsp[0]. That state
+  // must NOT take this early return: the fade/pickup machine below (fade_state 1/3/2) is the
+  // only thing that ever leaves the silent state, and returning here froze it at fade_state==1
+  // forever -- "go to a slot without a .nam, come back to a slot with files -> block stays
+  // dead". Only a missing dsp on a model that is supposed to be active is treated as dry.
+  if (bypass_byte != 0 || !ready || (!s.dsp[0] && s.active_index.load(std::memory_order_relaxed) >= 0))
   {
     for (uint32_t ch = 0; ch < numChannels; ++ch)
       if (input[ch] && output[ch])
