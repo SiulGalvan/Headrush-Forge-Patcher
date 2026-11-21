@@ -959,9 +959,19 @@ void switch_model_in_background(ModelState& s, float raw, bool force_reload_same
       } reset{s.switching};
 
       const int idx = knob_value_to_index(raw, static_cast<int>(g_cached_models.size()), dynamic_steps);
-      if (idx == -2 || (idx == s.active_index.load(std::memory_order_acquire) && !force_reload_same_model))
+      // BUG FIX (report: "Lead 800 Bright, go through the first 4 NAM files, then back to 0 ->
+      // sound disappears"): fade_state==3 means the audio thread has ALREADY faded the active
+      // model out and is muted, waiting for THIS call to deliver a model. If the knob came back
+      // to the still-installed active model while an earlier (now stale) load was in flight,
+      // the stale result is dropped and this call is the replacement request. Returning early
+      // here ("same as active, nothing to do") would deliver nothing, and the instance would
+      // stay muted forever. In that state the active model must be rebuilt and re-published.
+      const bool muted_waiting = s.fade_state.load(std::memory_order_relaxed) == 3;
+      if (idx == -2 ||
+          (idx == s.active_index.load(std::memory_order_acquire) && !force_reload_same_model && !muted_waiting))
         return; // no files found at all, or knob moved but landed back on the same state
-                // (unless a forced recalibration deliberately wants this same model rebuilt)
+                // (unless a forced recalibration deliberately wants this same model rebuilt,
+                // or the instance is muted waiting for a delivery -- see above)
 
       if (idx == -1)
       {
@@ -1745,6 +1755,45 @@ static amp_process_fn orig_amp_process()
   return fn;
 }
 
+// ---- Amp diagnostics (read-only helper, see docs/DIAG_AMP.md) -------------------------
+// The audio thread only stores a few atomics; a background thread writes them once per
+// second to /tmp/nam_amp_diag.txt (read it with the Bridge SHELL command) and polls the
+// switch file /tmp/nam_amp_noeq: while that file exists the post-NAM Bass/Mid/Treble/
+// Presence filters are skipped (A/B test: does the level anomaly come from our EQ?).
+std::atomic<float> g_dg_bass{0.f}, g_dg_mid{0.f}, g_dg_treble{0.f}, g_dg_pres{0.f};
+std::atomic<float> g_dg_gain{0.f}, g_dg_master{0.f};
+std::atomic<float> g_dg_pre_rms{0.f}, g_dg_pre_peak{0.f}, g_dg_post_rms{0.f}, g_dg_post_peak{0.f};
+std::atomic<int> g_dg_clipped{0};
+std::atomic<bool> g_dg_noeq{false};
+std::atomic<bool> g_dg_started{false};
+
+void start_amp_diag_thread()
+{
+  bool expected = false;
+  if (!g_dg_started.compare_exchange_strong(expected, true))
+    return;
+  spawn_detached([]() {
+    lower_background_thread_priority();
+    for (;;)
+    {
+      sleep(1);
+      g_dg_noeq.store(access("/tmp/nam_amp_noeq", F_OK) == 0, std::memory_order_relaxed);
+      FILE* f = fopen("/tmp/nam_amp_diag.txt", "w");
+      if (!f)
+        continue;
+      auto db = [](float v) { return v > 1e-9f ? 20.0f * std::log10(v) : -180.0f; };
+      fprintf(f,
+              "gain=%.3f master=%.3f bass=%.3f mid=%.3f treble=%.3f presence=%.3f noeq=%d\n"
+              "pre_eq  rms=%.1f dBFS  peak=%.1f dBFS\n"
+              "post_eq rms=%.1f dBFS  peak=%.1f dBFS  clipped_samples_last_block=%d\n",
+              g_dg_gain.load(), g_dg_master.load(), g_dg_bass.load(), g_dg_mid.load(), g_dg_treble.load(),
+              g_dg_pres.load(), g_dg_noeq.load() ? 1 : 0, db(g_dg_pre_rms.load()), db(g_dg_pre_peak.load()),
+              db(g_dg_post_rms.load()), db(g_dg_post_peak.load()), g_dg_clipped.load());
+      fclose(f);
+    }
+  });
+}
+
 extern "C" void nam_process_amp(void* this_, uint32_t param2, float** input, uint32_t numChannels,
                                 float** output, int32_t numFrames, uint32_t* flags, void* ctx)
 {
@@ -1799,6 +1848,14 @@ extern "C" void nam_process_amp(void* this_, uint32_t param2, float** input, uin
   const float model_select_raw = read_param(0x9538, 0.5f);
   const bool bright_on         = (*(self + 0x9518) != 0);
   const uint8_t bypass_byte    = *(self + 0x95a5);
+
+  start_amp_diag_thread();
+  g_dg_bass.store(bass_raw, std::memory_order_relaxed);
+  g_dg_mid.store(mid_raw, std::memory_order_relaxed);
+  g_dg_treble.store(treble_raw, std::memory_order_relaxed);
+  g_dg_pres.store(presence_raw, std::memory_order_relaxed);
+  g_dg_gain.store(gain_raw, std::memory_order_relaxed);
+  g_dg_master.store(master_raw, std::memory_order_relaxed);
 
   const float mid_freq_hz = 750.0f; // Classic British Marshall mid sweet-spot for tone stack
 
@@ -2000,6 +2057,9 @@ extern "C" void nam_process_amp(void* this_, uint32_t param2, float** input, uin
   }
 
   // Post-NAM conditioning: Active 3-Band EQ + Presence + Master Volume + Clamp
+  const bool eq_off = g_dg_noeq.load(std::memory_order_relaxed);
+  float pre_sq = 0.f, pre_pk = 0.f, post_sq = 0.f, post_pk = 0.f;
+  int clipped = 0;
   for (uint32_t ch = 0; ch < numChannels; ++ch)
   {
     if (!input[ch] || !output[ch])
@@ -2007,11 +2067,32 @@ extern "C" void nam_process_amp(void* this_, uint32_t param2, float** input, uin
     for (int32_t i = 0; i < numFrames; ++i)
     {
       float sample = output[ch][i];
-      sample = s.tone_bass[ch].process(sample);
-      sample = s.tone_mid[ch].process(sample);
-      sample = s.tone_treble[ch].process(sample);
-      sample = s.tone_presence[ch].process(sample);
-      output[ch][i] = std::clamp(sample * master_gain, -1.0f, 1.0f);
+      if (ch == 0)
+      {
+        pre_sq += sample * sample;
+        pre_pk = std::max(pre_pk, std::abs(sample));
+      }
+      if (!eq_off)
+      {
+        sample = s.tone_bass[ch].process(sample);
+        sample = s.tone_mid[ch].process(sample);
+        sample = s.tone_treble[ch].process(sample);
+        sample = s.tone_presence[ch].process(sample);
+      }
+      sample *= master_gain;
+      if (std::abs(sample) > 1.0f && ch == 0)
+        ++clipped;
+      output[ch][i] = std::clamp(sample, -1.0f, 1.0f);
+      if (ch == 0)
+      {
+        post_sq += output[ch][i] * output[ch][i];
+        post_pk = std::max(post_pk, std::abs(output[ch][i]));
+      }
     }
   }
+  g_dg_pre_rms.store(std::sqrt(pre_sq / static_cast<float>(numFrames)), std::memory_order_relaxed);
+  g_dg_pre_peak.store(pre_pk, std::memory_order_relaxed);
+  g_dg_post_rms.store(std::sqrt(post_sq / static_cast<float>(numFrames)), std::memory_order_relaxed);
+  g_dg_post_peak.store(post_pk, std::memory_order_relaxed);
+  g_dg_clipped.store(clipped, std::memory_order_relaxed);
 }
