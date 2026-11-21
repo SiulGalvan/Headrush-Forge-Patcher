@@ -93,7 +93,7 @@ class App(tk.Tk):
                         value="extended", command=self._sync).pack(anchor="w", padx=8, pady=2)
         ttk.Radiobutton(f, text="NAM Extended (fair): Extended without the idle-priority background threads (experimental)", variable=self.engine,
                         value="extended-fair", command=self._sync).pack(anchor="w", padx=8, pady=2)
-        self.cb_amp = ttk.Checkbutton(f, text="EXPERIMENTAL: NAM amp block (82 LEAD 800 Bright, with its own NAM picture) - Extended only, never run on hardware",
+        self.cb_amp = ttk.Checkbutton(f, text="EXPERIMENTAL: NAM amp block (82 LEAD 800 Bright, with its own NAM picture) - Extended only",
                                       variable=self.amp)
         self.cb_amp.pack(anchor="w", padx=24, pady=2)
 
