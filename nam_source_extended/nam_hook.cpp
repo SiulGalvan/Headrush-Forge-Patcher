@@ -548,10 +548,15 @@ struct Biquad
     const float alpha = sin_w / 2.0f * std::sqrt(2.0f);
     const float two_sqrt_A_alpha = 2.0f * std::sqrt(A) * alpha;
 
+    // RBJ high shelf. b0/b2 use +(A-1)*cos_w (the numerator of the LOW shelf has the minus sign).
+    // The previous version used the low-shelf numerator here, which added a large broadband gain
+    // (e.g. +17.7 dB at 100 Hz for Treble +12 dB, +14.5 dB for Treble -12 dB) instead of a shelf:
+    // any move of Treble/Presence away from 50% changed the overall level and drove the output
+    // clamp. Verified numerically against the RBJ cookbook.
     const float a0 = (A + 1.0f) - (A - 1.0f) * cos_w + two_sqrt_A_alpha;
-    b0 = (A * ((A + 1.0f) - (A - 1.0f) * cos_w + two_sqrt_A_alpha)) / a0;
+    b0 = (A * ((A + 1.0f) + (A - 1.0f) * cos_w + two_sqrt_A_alpha)) / a0;
     b1 = (-2.0f * A * ((A - 1.0f) + (A + 1.0f) * cos_w)) / a0;
-    b2 = (A * ((A + 1.0f) - (A - 1.0f) * cos_w - two_sqrt_A_alpha)) / a0;
+    b2 = (A * ((A + 1.0f) + (A - 1.0f) * cos_w - two_sqrt_A_alpha)) / a0;
     a1 = (2.0f * ((A - 1.0f) - (A + 1.0f) * cos_w)) / a0;
     a2 = ((A + 1.0f) - (A - 1.0f) * cos_w - two_sqrt_A_alpha) / a0;
   }
@@ -1832,9 +1837,9 @@ extern "C" void nam_process_amp(void* this_, uint32_t param2, float** input, uin
   //   0x9500: Gain       (Page 1, Knob 1: 0.0..1.0, default 0.5)
   //   0x9510: Presence   (Page 1, Knob 2: 0.0..1.0, default 0.5)
   //   0x9508: Master     (Page 1, Knob 3: 0.0..1.0, default 0.5)
-  //   0x9524: Bass       (Page 2, Knob 1: 0.0..1.0, default 0.5)
+  //   0x9524: Treble     (Page 2, Knob 1 slot; measured on hardware -- the on-screen Treble knob)
   //   0x9528: Mid        (Page 2, Knob 2: 0.0..1.0, default 0.5)
-  //   0x952c: Treble     (Page 2, Knob 3: 0.0..1.0, default 0.5)
+  //   0x952c: Bass       (Page 2, Knob 3 slot; measured on hardware -- the on-screen Bass knob)
   //   0x9538: Depth      (Page 3, Knob 1: 0.0..1.0, default 0.5) -> NAM Model Selector
   //   0x9518: Bright     (Page 3, Switch: uint8_t, 0=Off, 1=On)  -> Pre-NAM Tight Cut HPF
   //   0x95a5: Bypass     (Block On/Off:   uint8_t, 0=On,  1=Bypassed/Off)
@@ -1842,9 +1847,13 @@ extern "C" void nam_process_amp(void* this_, uint32_t param2, float** input, uin
   const float gain_raw         = read_param(0x9500, 0.5f);
   const float presence_raw     = read_param(0x9510, 0.5f);
   const float master_raw       = read_param(0x9508, 0.5f);
-  const float bass_raw         = read_param(0x9524, 0.5f);
+  // Bass/Treble slots are swapped relative to the original (wrong) assumption: measured on a real
+  // MX5 with the diagnostic build (2026-11-21), moving the on-screen BASS knob changed the value at
+  // 0x952c and the on-screen TREBLE knob changed the value at 0x9524 (Mid at 0x9528 and Presence at
+  // 0x9510 were as documented). So 0x9524 = Treble, 0x952c = Bass.
+  const float bass_raw         = read_param(0x952c, 0.5f);
   const float mid_raw          = read_param(0x9528, 0.5f);
-  const float treble_raw       = read_param(0x952c, 0.5f);
+  const float treble_raw       = read_param(0x9524, 0.5f);
   const float model_select_raw = read_param(0x9538, 0.5f);
   const bool bright_on         = (*(self + 0x9518) != 0);
   const uint8_t bypass_byte    = *(self + 0x95a5);
